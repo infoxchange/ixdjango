@@ -16,9 +16,9 @@ setup(
     description='Bunch of tools useful to all IX Django projects.',
     long_description=open('README.txt').read(),
     install_requires=[
-        "Django>=1.3.0",
-        "pep8>=1.0.1",
-        "pylint>=0.25.1"
+        "Django >= 1.3.0",
+        "pep8 >= 1.0.1",
+        "pylint >= 0.25.1"
     ],
 )
 
