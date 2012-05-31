@@ -15,6 +15,7 @@ setup(
     license='',
     description='Bunch of tools useful to all IX Django projects.',
     long_description=open('README.txt').read(),
+    zip_safe=False,
     install_requires=[
         "Django >= 1.3.0",
         "pep8 >= 1.0.1",
