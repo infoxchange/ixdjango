@@ -3,14 +3,15 @@ from distutils.core import setup
 # find_packages comes in handy for deep trees. see
 # http://bruno.im/2010/may/05/packaging-django-reusable-app/
 #
-from setuptools import find_packages
+#from setuptools import find_packages
 
 setup(
     name='IXDjango',
     version='0.1.0',
     author='IXA dev team',
     author_email='development@infoxchange.net.au',
-    packages=find_packages(),
+    #packages=find_packages(),
+    packages=['ixdjango'],
     url='',
     license='',
     description='Bunch of tools useful to all IX Django projects.',
