@@ -4,6 +4,15 @@ IX Django
 
 Management commands for IX Django applications.
 
+Installation
+------------
+
+* Go to your project directory and start its virtual environment
+* pip install -e git+ssh://gitosis@code/django/ixdjango.git#egg=ixdjango
+
+
+Commands provided
+-----------------
 
 deploy
 ======
