@@ -12,7 +12,7 @@ setup(
     author_email='development@infoxchange.net.au',
     packages=find_packages(),
     description='Bunch of tools useful to all IX Django projects.',
-    long_description=open('README.txt').read(),
+    long_description=open('README').read(),
     install_requires=[
         "Django >= 1.3.0",
         "pep8 >= 1.0.1",
