@@ -4,8 +4,7 @@ from distutils.core import setup
 # http://bruno.im/2010/may/05/packaging-django-reusable-app/
 #
 from setuptools import find_packages
-import warnings
-warnings.warn("-%s-" % find_packages())
+
 setup(
     name='IXDjango',
     version='0.1.0',
@@ -14,7 +13,6 @@ setup(
     packages=find_packages(),
     description='Bunch of tools useful to all IX Django projects.',
     long_description=open('README.txt').read(),
-    zip_safe=False,
     install_requires=[
         "Django >= 1.3.0",
         "pep8 >= 1.0.1",
