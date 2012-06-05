@@ -1,2 +1,3 @@
 *.pyc
 IXDjango.egg-info
+*.egg-info
