@@ -1,3 +1,6 @@
+"""
+Package configuration file
+"""
 from distutils.core import setup
 #
 # find_packages comes in handy for deep trees. see
