@@ -2,13 +2,7 @@
 IX Django
 =========
 
-Management commands for IX Django applications.
-
-Installation
-------------
-
-* Go to your project directory and start its virtual environment
-* pip install -e git+ssh://gitosis@code/django/ixdjango.git#egg=ixdjango
+Management commands for Django application deployments.
 
 
 Commands provided
@@ -25,3 +19,14 @@ loadixfixtures
 
 Loads fixtures declared in IX_FIXTURES variable in the application settings
 file
+
+
+Dependencies
+------------
+
+* Django: Might work on older versions but was developed for 1.3.0.
+* pep8 and pylint: Not required for functionality but we like QC before
+committing any code changes so these tools need to be available. Note that
+if you'd like to contribute, any code you write must give a clean output with
+pep8 and score 10/10 with pylint using the configuration file
+conf/pylint.conf in the package
