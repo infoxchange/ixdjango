@@ -2,6 +2,7 @@
 Utility classes/functions
 """
 from random import choice
+import re
 
 
 def random_string(length=10,
@@ -50,22 +51,30 @@ def remote_addr_from_request(request):
         return request.META['REMOTE_ADDR']
 
 
-def flatten_request_headers(headers):
+def flatten_request_header(header):
     """
     Transform a dict representing header parameters into a flat string of
     comma separated parameters suitable for inserting into the actual
     headers
     """
-    flattened_headers = {}
-    for header_type, header_content in headers.items():
-        if isinstance(header_content, dict):
-            contents = []
-            for content_key, content_val in header_content.items():
-                contents.append('%s="%s"' % (content_key, content_val))
-            flattened_headers[header_type] = ','.join(contents)
-        else:
-            flattened_headers[header_type] = header_content
-    return flattened_headers
+    flattened_header = ''
+    if isinstance(header, dict):
+        contents = []
+        for content_key, content_val in header.items():
+            contents.append('%s="%s"' % (content_key, content_val))
+
+        flattened_header = ','.join(contents)
+    else:
+        flattened_header = str(header)
+
+    return flattened_header
+
+
+def flatten_auth_header(headers_dict, auth_type):
+    """
+    Auth headers have auth type at the start of the string
+    """
+    return "%s %s" % (auth_type, flatten_request_header(headers_dict))
 
 
 def flat_header_val_to_dict(header_val):
@@ -90,3 +99,16 @@ def flat_header_val_to_dict(header_val):
             else:
                 val_dict[key] = val
     return val_dict
+
+
+def flat_auth_header_val_to_data(header_val):
+    """
+    Capture auth type from the string and then remove it before passing on to
+    flat_header_val_to_dict
+    """
+    match = re.match(r'^([\S]+[\s]+)?(.*)$', header_val)
+    if match and match.group(1):
+        return (flat_header_val_to_dict(match.group(2).strip()),
+                match.group(1).strip())
+
+    return (flat_header_val_to_dict(header_val), None)
