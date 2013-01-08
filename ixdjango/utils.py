@@ -5,8 +5,24 @@ from random import choice
 import re
 
 
-def random_string(length=10,
-        chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'):
+class RequestHeaderException(Exception):
+    """
+    Custom exception to deal with request header errors
+    """
+    def __str__(self):
+        """
+        Add info specific to this exception
+        """
+        return (
+            "Bad Request Header: %s"
+            % super(RequestHeaderException, self).__str__()
+        )
+
+
+def random_string(
+    length=10,
+    chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+):
     """
     Generates a random string of length specified and using supplied chars.
     Useful for salting hashing functions
@@ -87,7 +103,7 @@ def flat_header_val_to_dict(header_val):
         for val_comp in val_comps:
             key, sep, val = val_comp.partition("=")
             if sep != "=":
-                raise TypeError("non key/val entry in header")
+                raise RequestHeaderException("non key/val entry in header")
             key = key.strip()
             val = val.strip()
             val = val.strip('"')
