@@ -37,4 +37,7 @@ class Command(NoArgsCommand):
         if deploy_cmds:
             for cmd in deploy_cmds:
                 # interactive=False is the same as --noinput.
-                management.call_command(cmd, interactive=False)
+                args = {}
+                if type(cmd) is tuple:
+                    (cmd, args) = cmd
+                management.call_command(cmd, interactive=False, **args)
