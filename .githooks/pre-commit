@@ -1,0 +1,233 @@
+#!/usr/bin/python
+# pylint:disable=C0103
+"""
+Git pre-commit hook for performing quality checks on python code using flake8
+and pylint
+"""
+
+import atexit
+import os
+import os.path
+import sys
+import re
+from subprocess import Popen, PIPE
+
+#
+# Threshold for code to pass the Pylint test. 10 is the highest score Pylint
+# will give to any peice of code.
+#
+_PYLINT_PASS_THRESHOLD = 10
+
+#
+# Note that if _PROJECT_ENV is set to None, we are dealing with a python
+# packaged app
+#
+_PROJECT_ENV = "ixdjango_env"
+
+FLAKE8_CONF = "conf/flake8.conf"
+
+PYLINT_CONF = "conf/pylint.conf"
+
+
+def main():
+    """
+    Script execution control
+    """
+    #
+    # Save the merge state and restore it on exit if a merge is in progress
+    #
+    merge_head_file = '.git/MERGE_HEAD'
+    if os.path.exists(merge_head_file):
+        merge = open(merge_head_file).read()
+        atexit.register(output, ("git update-ref MERGE_HEAD " + merge).split())
+
+    #
+    # Revert the unstaged changes to get back to the state which is committed
+    #
+    output("git stash --keep-index".split())
+    atexit.register(output, "git stash pop".split())
+
+    #
+    # Put together the list of files changed
+    #
+    cmd = "git diff --staged --name-only --diff-filter=ACMRTUXB HEAD".split()
+    sub = Popen(cmd, stdout=PIPE)
+    sub.wait()
+    files_changed = []
+    for changed_file in [f.strip() for f in sub.stdout.readlines()]:
+        files_changed.append(changed_file)
+
+    #
+    # Check Python files
+    #
+    (python_pass, python_results) = check_python_code(files_changed)
+
+    if not python_pass:
+        print "\nYOUR CODE SUCKS! FIX THIS STUFF BEFORE COMMITTING:\n"
+        print python_results
+        sys.exit(1)
+
+    print "Your code looks good. Continuing with commit."
+    sys.exit(0)
+
+
+def output(command):
+    """
+    Read the command output regardless of the exit code
+    """
+    sub = Popen(command, stdout=PIPE)
+    sub.wait()
+    return sub.stdout.read()
+
+
+def check_python_code(files_changed):
+    """
+    Runs flake8 and pylint tests on python files
+    """
+    py_files_changed = []
+    python_pass = True
+    python_results = ""
+
+    #
+    # Grab the python files from changed files
+    #
+    for changed_file in files_changed:
+        if ((changed_file.endswith(".py") and os.path.exists(changed_file))
+                or is_py_script(changed_file)):
+
+            py_files_changed.append(changed_file)
+
+    #
+    # Nothing to do if there are no python files
+    #
+    if not len(py_files_changed):
+        return (python_pass, python_results)
+
+    if _PROJECT_ENV:
+        #
+        # Bail out if we're not in a virtualenv as the tools
+        # we need for further checking should not be available
+        # otherwise
+        #
+        if not 'VIRTUAL_ENV' in os.environ:
+            print ("\nActivate project virtualenv" +
+                   " before committing python files!\n")
+            sys.exit(1)
+
+        #
+        # Bail out if we're not in the correct virtualenv
+        #
+        if not re.search('/' + _PROJECT_ENV + '$', os.environ['VIRTUAL_ENV']):
+            print ("\nYou are in the wrong virtual env. Activate " +
+                   _PROJECT_ENV + " before committing python files!\n")
+            sys.exit(1)
+
+    try:
+        (python_pass, python_results) = check_flake8(python_pass,
+                                                     python_results)
+        (python_pass, python_results) = check_pylint(python_pass,
+                                                     python_results)
+    except:
+        print ("\nCould not check your code with flake8 and/or pylint. " +
+               "Make sure that you're committing in a virtual environment " +
+               "where they are available!\n")
+        raise
+
+    return (python_pass, python_results)
+
+
+def check_flake8(python_pass, python_results):
+    """
+    Run Flake8 on the project.
+    Nothing short of perfect will do for this.
+    """
+
+    cmd = ["flake8"]
+    if os.path.exists(FLAKE8_CONF):
+        cmd.append("--config=" + FLAKE8_CONF)
+
+    cmd.append(".")
+    flake8_result = output(cmd)
+    #
+    # If the project is fine, flake8 output for it should be 'None'
+    #
+    if flake8_result:
+        python_pass = False
+        python_results += "Project failed flake8 check:\n%s\n" % flake8_result
+        python_results += "Re-run with:\n%s\n\n" % ' '.join(cmd)
+
+    return (python_pass, python_results)
+
+
+def check_pylint(python_pass, python_results):
+    """
+    Check Pylint compliance of the project.
+    Pass/Fail is based on _PYLINT_PASS_THRESHOLD setting.
+    """
+
+    cmd = ["pylint"]
+
+    if os.path.exists(PYLINT_CONF):
+        cmd.append("--rcfile=" + PYLINT_CONF)
+
+    #
+    # build a list of modules (directories which have __init__.py)
+    #
+    for module in os.listdir('.'):
+        if os.path.exists(os.path.join(module, '__init__.py')):
+            (python_pass, python_results) = run_pylint(module,
+                                                       python_pass,
+                                                       python_results)
+
+    return (python_pass, python_results)
+
+
+def run_pylint(path, python_pass, python_results):
+    """
+    Run pylint on the specified path and report the results.
+    """
+    cmd = ["pylint"]
+
+    if os.path.exists(PYLINT_CONF):
+        cmd.append("--rcfile=" + PYLINT_CONF)
+
+    cmd.append(path)
+
+    result = output(cmd)
+
+    #
+    # Get the rating from the result
+    #
+    rating = pylint_rating(result)
+    if rating < _PYLINT_PASS_THRESHOLD:
+        python_pass = False
+        python_results += "%s failed PyLint check " % path
+        python_results += ("(scored %s, min allowed is %s)\n"
+                           % (rating, _PYLINT_PASS_THRESHOLD))
+        python_results += "Re-run with:\n%s\n\n" % ' '.join(cmd)
+
+    return (python_pass, python_results)
+
+
+def pylint_rating(result):
+    """
+    Extract the rating rating from PyLint output.
+    """
+    rating = re.search(r"Your code has been rated at ([-\d\.]+)/10", result)
+    return float(rating.group(1))
+
+
+def is_py_script(filename):
+    """
+    Test a file to see if it's a python script. These scripts don't necessarily
+    have .py extensions so we check for the shebang line instead
+    """
+    try:
+        first_line = open(filename, "r").next().strip()
+        return "#!" in first_line and "python" in first_line
+    except StopIteration:
+        return False
+
+
+if __name__ == '__main__':
+    main()
