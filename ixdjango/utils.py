@@ -1,8 +1,10 @@
 """
 Utility classes/functions
 """
+import os
 from random import choice
 import re
+from subprocess import PIPE, Popen
 
 
 class RequestHeaderException(Exception):
@@ -124,3 +126,19 @@ def flat_auth_header_val_to_data(header_val):
                 match.group(1).strip())
 
     return (flat_header_val_to_dict(header_val), None)
+
+
+def get_npm_module(module):
+    """
+    Return the path of an npm module binary
+
+    Example:
+
+    get_npm_module('lessc')
+    """
+
+    proc = Popen(['npm', 'bin'], stdout=PIPE)
+    proc.wait()
+    path = proc.stdout.read().strip()
+
+    return os.path.join(path, module)
