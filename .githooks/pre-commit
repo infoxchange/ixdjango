@@ -1,16 +1,26 @@
-#!/usr/bin/python
-# pylint:disable=C0103
+#!/usr/bin/env python
+# pylint:disable=invalid-name
 """
-Git pre-commit hook for performing quality checks on python code using flake8
+Git pre-commit hook for performing quality checks on python code using pep8
 and pylint
 """
 
 import atexit
+
 import os
 import os.path
-import sys
+
+from optparse import OptionParser
+
 import re
+
+import shutil
+
 from subprocess import Popen, PIPE
+
+import sys
+
+import tempfile
 
 #
 # Threshold for code to pass the Pylint test. 10 is the highest score Pylint
@@ -18,216 +28,192 @@ from subprocess import Popen, PIPE
 #
 _PYLINT_PASS_THRESHOLD = 10
 
-#
-# Note that if _PROJECT_ENV is set to None, we are dealing with a python
-# packaged app
-#
-_PROJECT_ENV = "ixdjango_env"
+PEP8_CONF = 'conf/pep8.conf'
 
-FLAKE8_CONF = "conf/flake8.conf"
-
-PYLINT_CONF = "conf/pylint.conf"
-
-
-def main():
-    """
-    Script execution control
-    """
-    #
-    # Save the merge state and restore it on exit if a merge is in progress
-    #
-    merge_head_file = '.git/MERGE_HEAD'
-    if os.path.exists(merge_head_file):
-        merge = open(merge_head_file).read()
-        atexit.register(output, ("git update-ref MERGE_HEAD " + merge).split())
-
-    #
-    # Revert the unstaged changes to get back to the state which is committed
-    #
-    output("git stash --keep-index".split())
-    atexit.register(output, "git stash pop".split())
-
-    #
-    # Put together the list of files changed
-    #
-    cmd = "git diff --staged --name-only --diff-filter=ACMRTUXB HEAD".split()
-    sub = Popen(cmd, stdout=PIPE)
-    sub.wait()
-    files_changed = []
-    for changed_file in [f.strip() for f in sub.stdout.readlines()]:
-        files_changed.append(changed_file)
-
-    #
-    # Check Python files
-    #
-    (python_pass, python_results) = check_python_code(files_changed)
-
-    if not python_pass:
-        print "\nYOUR CODE SUCKS! FIX THIS STUFF BEFORE COMMITTING:\n"
-        print python_results
-        sys.exit(1)
-
-    print "Your code looks good. Continuing with commit."
-    sys.exit(0)
+PYLINT_CONF = 'conf/pylint.conf'
 
 
 def output(command):
     """
     Read the command output regardless of the exit code
     """
+    command = command.split()
     sub = Popen(command, stdout=PIPE)
     sub.wait()
     return sub.stdout.read()
 
 
-def check_python_code(files_changed):
+class Main(object):
     """
-    Runs flake8 and pylint tests on python files
+    Check the Python code in the project.
     """
-    py_files_changed = []
-    python_pass = True
-    python_results = ""
+    def __init__(self, force=False):
+        """
+        Initialise the checker. Set @force to True to check all the files
+        and not just the changed ones.
+        """
+        self.force = force
 
-    #
-    # Grab the python files from changed files
-    #
-    for changed_file in files_changed:
-        if ((changed_file.endswith(".py") and os.path.exists(changed_file))
-                or is_py_script(changed_file)):
+    def pep8(self):
+        """
+        Run pep8 on the project.
+        Nothing short of perfect will do for this.
+        """
 
-            py_files_changed.append(changed_file)
+        import pep8
 
-    #
-    # Nothing to do if there are no python files
-    #
-    if not len(py_files_changed):
-        return (python_pass, python_results)
+        pep_opts = {}
+        if os.path.exists(PEP8_CONF):
+            pep_opts['config_file'] = PEP8_CONF
 
-    if _PROJECT_ENV:
-        #
-        # Bail out if we're not in a virtualenv as the tools
-        # we need for further checking should not be available
-        # otherwise
-        #
-        if not 'VIRTUAL_ENV' in os.environ:
-            print ("\nActivate project virtualenv" +
-                   " before committing python files!\n")
-            sys.exit(1)
+        style = pep8.StyleGuide(**pep_opts)
+        report = style.check_files((self.index,))
+        count = report.total_errors
+        if count > 0:
+            print "Project failed pep8 check: %d error(s)." % count
+            cmd = "pep8 "
+            if 'config_file' in pep_opts:
+                cmd += "--config=%s " % pep_opts['config_file']
+            cmd += "."
+            print "Re-run with:\n%s\n" % cmd
+            return False
 
-        #
-        # Bail out if we're not in the correct virtualenv
-        #
-        if not re.search('/' + _PROJECT_ENV + '$', os.environ['VIRTUAL_ENV']):
-            print ("\nYou are in the wrong virtual env. Activate " +
-                   _PROJECT_ENV + " before committing python files!\n")
-            sys.exit(1)
+        return True
 
-    try:
-        (python_pass, python_results) = check_flake8(python_pass,
-                                                     python_results)
-        (python_pass, python_results) = check_pylint(python_pass,
-                                                     python_results)
-    except:
-        print ("\nCould not check your code with flake8 and/or pylint. " +
-               "Make sure that you're committing in a virtual environment " +
-               "where they are available!\n")
-        raise
+    def pylint(self):
+        """
+        Run PyLint on the project.
+        """
 
-    return (python_pass, python_results)
+        # Build a list of targets
+        targets = []
+        modules = self.modules()
+        for module in modules:
+            targets.append(module)
+        for file_ in self.changed_py_files():
+            if not any(file_.startswith(m) for m in modules):
+                targets.append(file_)
 
+        ok = True
+        for target in targets:
+            cmd = 'pylint'
 
-def check_flake8(python_pass, python_results):
-    """
-    Run Flake8 on the project.
-    Nothing short of perfect will do for this.
-    """
+            if os.path.exists(PYLINT_CONF):
+                cmd += ' --rcfile=' + PYLINT_CONF
 
-    cmd = ["flake8"]
-    if os.path.exists(FLAKE8_CONF):
-        cmd.append("--config=" + FLAKE8_CONF)
+            cmd += ' %%s%s' % target
 
-    cmd.append(".")
-    flake8_result = output(cmd)
-    #
-    # If the project is fine, flake8 output for it should be 'None'
-    #
-    if flake8_result:
-        python_pass = False
-        python_results += "Project failed flake8 check:\n%s\n" % flake8_result
-        python_results += "Re-run with:\n%s\n\n" % ' '.join(cmd)
+            result = output(cmd % self.index)
 
-    return (python_pass, python_results)
+            #
+            # Get the rating from the result
+            #
+            rating = pylint_rating(result)
+            if rating < _PYLINT_PASS_THRESHOLD:
+                ok = False
+                print "%s failed PyLint check (scored %s, min allowed is %s)" \
+                    % (target, rating, _PYLINT_PASS_THRESHOLD)
+                print "Re-run with:\n%s\n" % (cmd % '')
 
+        return ok
 
-def check_pylint(python_pass, python_results):
-    """
-    Check Pylint compliance of the project.
-    Pass/Fail is based on _PYLINT_PASS_THRESHOLD setting.
-    """
+    def copy_index(self):
+        """
+        Create a copy of index in a temporary directory.
+        """
+        # pylint:disable=attribute-defined-outside-init
+        self.index = tempfile.mkdtemp() + '/'
+        output('git checkout-index --prefix=%s -af' % self.index)
 
-    cmd = ["pylint"]
+    # pylint:disable=no-self-use
+    def changed_files(self):
+        """
+        A list of files changed in the index.
+        """
+        if self.force:
+            cmd = 'git ls-tree -r --name-only HEAD'
+        else:
+            cmd = 'git diff --staged --diff-filter=ACMRTUXB --name-only HEAD'
+        return output(cmd).split()
 
-    if os.path.exists(PYLINT_CONF):
-        cmd.append("--rcfile=" + PYLINT_CONF)
+    def changed_py_files(self):
+        """
+        A list of Python files changed in the index
+        """
+        def is_py_file(filename):
+            """
+            Determine whether a script is a Python file
+            """
+            if not os.path.exists(filename):
+                return False
+            if filename.endswith('.py'):
+                return True
+            try:
+                first_line = open(filename, 'r').next().strip()
+                return '#!' in first_line and 'python' in first_line
+            except StopIteration:
+                return False
 
-    #
-    # build a list of modules (directories which have __init__.py)
-    #
-    for module in os.listdir('.'):
-        if os.path.exists(os.path.join(module, '__init__.py')):
-            (python_pass, python_results) = run_pylint(module,
-                                                       python_pass,
-                                                       python_results)
+        try:
+            return self._changed_py_files
+        except AttributeError:
+            # pylint:disable=attribute-defined-outside-init
+            self._changed_py_files = \
+                [f for f in self.changed_files() if is_py_file(f)]
+            return self._changed_py_files
 
-    return (python_pass, python_results)
+    def modules(self):
+        """
+        A list of Python modules in the checkout.
+        """
+        def is_module(module):
+            """
+            Determine whether a directory contains a Python module.
+            """
+            return os.path.exists(os.path.join(module, '__init__.py'))
+        return list(m for m in os.listdir(self.index) if is_module(m))
 
+    def cleanup(self):
+        """
+        Delete temporary files.
+        """
+        shutil.rmtree(self.index, ignore_errors=True)
 
-def run_pylint(path, python_pass, python_results):
-    """
-    Run pylint on the specified path and report the results.
-    """
-    cmd = ["pylint"]
-
-    if os.path.exists(PYLINT_CONF):
-        cmd.append("--rcfile=" + PYLINT_CONF)
-
-    cmd.append(path)
-
-    result = output(cmd)
-
-    #
-    # Get the rating from the result
-    #
-    rating = pylint_rating(result)
-    if rating < _PYLINT_PASS_THRESHOLD:
-        python_pass = False
-        python_results += "%s failed PyLint check " % path
-        python_results += ("(scored %s, min allowed is %s)\n"
-                           % (rating, _PYLINT_PASS_THRESHOLD))
-        python_results += "Re-run with:\n%s\n\n" % ' '.join(cmd)
-
-    return (python_pass, python_results)
+    def main(self):
+        """
+        Run all the necessary checks.
+        """
+        if len(self.changed_py_files()) == 0 and not self.force:
+            print "No Python files changed. Pre-commit tests skipped."
+            return True
+        if 'VIRTUAL_ENV' not in os.environ:
+            print "Virtual environment needs to be activated to run the " + \
+                  "pre-commit tests."
+            return False
+        atexit.register(self.cleanup)
+        self.copy_index()
+        good = [func() for func in (self.pep8, self.pylint)]
+        if all(good):
+            print "Your code looks good. Continuing with commit."
+            return True
+        else:
+            print "Pre-commit tests failed."
+            return False
 
 
 def pylint_rating(result):
     """
     Extract the rating rating from PyLint output.
     """
-    rating = re.search(r"Your code has been rated at ([-\d\.]+)/10", result)
+    rating = re.search(r'Your code has been rated at ([-\d\.]+)/10', result)
     return float(rating.group(1))
 
 
-def is_py_script(filename):
-    """
-    Test a file to see if it's a python script. These scripts don't necessarily
-    have .py extensions so we check for the shebang line instead
-    """
-    try:
-        first_line = open(filename, "r").next().strip()
-        return "#!" in first_line and "python" in first_line
-    except StopIteration:
-        return False
-
-
 if __name__ == '__main__':
-    main()
+    parser = OptionParser()
+    parser.add_option('-f', '--force', action='store_true', dest='force',
+                      help='force a check even if no Python files changed')
+    (options, args) = parser.parse_args()
+    hook = Main(**options.__dict__)
+    success = hook.main()
+    sys.exit(0 if success else 1)

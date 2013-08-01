@@ -27,11 +27,7 @@ def random_string(
     Generates a random string of length specified and using supplied chars.
     Useful for salting hashing functions
     """
-    #
-    # pylint:disable=W0612
-    # Not using i but it has to be there
-    #
-    return ''.join([choice(chars) for i in range(length)])
+    return ''.join([choice(chars) for _ in range(length)])
 
 
 def querydict_to_dict(querydict):

@@ -2,9 +2,9 @@
 Tests for WSX Core Utility Classes/functions
 """
 #
-# pylint:disable=R0904,C0103
-# - R0904: Stuff inheriting from TestCase always has too many public methods
-# - C0103: test function names too long; following a pattern
+# pylint:disable=invalid-name,too-many-public-methods
+# - Classes inheriting from TestCase always has too many public methods
+# - Test function names too long; following a pattern
 #
 from django.test import TestCase
 from django.http import HttpRequest, QueryDict

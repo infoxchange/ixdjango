@@ -1,8 +1,7 @@
 """
 Package configuration file
 """
-from distutils.core import setup
-from setuptools import find_packages
+from setuptools import find_packages, setup
 
 setup(
     name='IXDjango',
@@ -16,7 +15,10 @@ setup(
     long_description=open('README').read(),
     install_requires=[
         "Django >= 1.3.0",
-        "flake8 >= 2.0",
-        "pylint >= 0.27.0"
+    ],
+    tests_require=[
+        "pep8 >= 1.4.6",
+        "pylint >= 0.28.0",
+        "pylint-mccabe >= 0.1.3",
     ],
 )

@@ -5,6 +5,10 @@ Hook into the test runner
 import subprocess
 
 from django.test.simple import DjangoTestSuiteRunner
+from django.utils import unittest
+
+from ixdjango.test_suite.utils import (CoreUtilsTests)
+
 
 class TestRunner(DjangoTestSuiteRunner):
     """
@@ -27,15 +31,6 @@ class TestRunner(DjangoTestSuiteRunner):
                          "psql -c 'alter user %s with createdb;'" % username])
 
         return super(TestRunner, self).setup_test_environment(*args, **kwargs)
-
-"""
-Configures test suite for the package
-"""
-from django.utils import unittest
-
-from ixdjango.test_suite.utils import (
-    CoreUtilsTests
-)
 
 
 def suite():
