@@ -45,7 +45,7 @@ class Command(NoArgsCommand):
         user = pwd.getpwuid(os.getuid())
 
         headers = {
-            'x-api-key': config.license_key
+            'x-api-key': settings.NEW_RELIC_API_KEY,
         }
         post = {
             'deployment[app_name]': config.app_name,
