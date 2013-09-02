@@ -20,9 +20,7 @@ import newrelic.agent
 
 class Command(NoArgsCommand):
     """
-    Loads the fixtures contained inside IX_FIXTURES setting variable.
-
-    See http://redmine.office.infoxchange.net.au/issues/8376
+    Notify New Relic of the new version
     """
 
     URL = 'https://rpm.newrelic.com/deployments.xml'
