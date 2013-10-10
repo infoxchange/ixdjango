@@ -11,6 +11,7 @@ from django.db import connection
 from django.db.models import get_app, get_models
 from south.db import db
 
+# pylint:disable=protected-access
 
 class Command(BaseCommand):
     """
@@ -28,7 +29,7 @@ class Command(BaseCommand):
             ]
             models += app_models
             print "Found %d model(s) for %s" % (len(app_models), app)
-        
+
         db.start_transaction()
 
         for model in models:
