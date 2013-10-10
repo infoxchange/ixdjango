@@ -20,6 +20,11 @@ loadixfixtures
 Loads fixtures declared in IX_FIXTURES variable in the application settings
 file
 
+clear_app
+=========
+
+Clear specified app's models of data
+
 
 Dependencies
 ------------
