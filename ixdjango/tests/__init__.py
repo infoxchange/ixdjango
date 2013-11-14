@@ -4,13 +4,16 @@ Hook into the test runner
 
 import subprocess
 
-from django.test.simple import DjangoTestSuiteRunner
+try:
+    from django.test.runner import DiscoverRunner as BaseTestRunner
+except ImportError:
+    from django.test.simple import DjangoTestSuiteRunner as BaseTestRunner
 from django.utils import unittest
 
 from ixdjango.test_suite.utils import (CoreUtilsTests)
 
 
-class TestRunner(DjangoTestSuiteRunner):
+class TestRunner(BaseTestRunner):
     """
     Place where we hook into DjangoTestSuiteRunner
     """
