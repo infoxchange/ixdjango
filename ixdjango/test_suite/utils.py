@@ -74,6 +74,9 @@ class CoreUtilsTests(TestCase):
         expected = {'a': 'b', 'c': 'd', 'e': 'f', 'g': 'h'}
         self.assertEqual(flat_header_val_to_dict(header_val), expected)
 
+        header_val = 'notadict'
+        self.assertEqual(flat_header_val_to_dict('notadict'), {})
+
     def test_flatten_auth_header(self):
         """
         Auth headers contain a auth type at the start
