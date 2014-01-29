@@ -5,6 +5,7 @@ Hook into the test runner
 import subprocess
 
 try:
+    # pylint:disable=import-error,no-name-in-module
     from django.test.runner import DiscoverRunner as BaseTestRunner
 except ImportError:
     from django.test.simple import DjangoTestSuiteRunner as BaseTestRunner

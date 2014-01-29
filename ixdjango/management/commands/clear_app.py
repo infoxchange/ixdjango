@@ -13,6 +13,7 @@ from south.db import db
 
 # pylint:disable=protected-access
 
+
 class Command(BaseCommand):
     """
     A command to clear app data.
