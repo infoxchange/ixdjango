@@ -12,7 +12,7 @@ setup(
     url='http://pypi.python.org/pypi/IXDjango/',
     license='MIT',
     description='Management commands for deploying Django projects.',
-    long_description=open('README').read(),
+    long_description=open('README.md').read(),
     install_requires=[
         "Django >= 1.3.0",
     ],
