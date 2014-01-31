@@ -8,22 +8,28 @@ Management commands for Django application deployments.
 Commands provided
 -----------------
 
-deploy
-======
+`deploy`
+========
 
-Executes a list of commands declared in IX_DEPLOY_CMDS variable in the
+Executes a list of commands declared in `IX_DEPLOY_CMDS` variable in the
 application settings file
 
-loadixfixtures
-==============
+`loadixfixtures`
+================
 
-Loads fixtures declared in IX_FIXTURES variable in the application settings
+Loads fixtures declared in `IX_FIXTURES` variable in the application settings
 file
 
-clear_app
-=========
+`clear_app`
+===========
 
 Clear specified app's models of data
+
+`newrelic_notify_deploy`
+========================
+
+Uses the settings `NEW_RELIC_CONFIG`, `NEW_RELIC_ENV` and `NEW_RELIC_API_KEY`
+to inform New Relic of an application deployment.
 
 
 Dependencies
