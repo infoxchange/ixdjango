@@ -15,6 +15,7 @@ setup(
     long_description=open('README.md').read(),
     install_requires=[
         "Django >= 1.3.0",
+        "httplib2",
     ],
     tests_require=[
         "pep8 >= 1.4.6",
