@@ -10,7 +10,7 @@ import os
 from subprocess import Popen, PIPE
 from urllib import urlencode
 
-from httplib2 import Http
+from httplib2 import Http, proxy_info_from_environment
 
 from django.conf import settings
 from django.core.management.base import NoArgsCommand
@@ -56,7 +56,7 @@ class Command(NoArgsCommand):
         print "Informing New Relic...",
 
         # post this data
-        http = Http()
+        http = Http(proxy_info_from_environment())
         response, _ = http.request(self.URL, 'POST',
                                    headers=headers,
                                    body=urlencode(post))
