@@ -56,7 +56,7 @@ class Command(NoArgsCommand):
         print "Informing New Relic...",
 
         # post this data
-        http = Http(proxy_info_from_environment())
+        http = Http(proxy_info=proxy_info_from_environment())
         response, _ = http.request(self.URL, 'POST',
                                    headers=headers,
                                    body=urlencode(post))
