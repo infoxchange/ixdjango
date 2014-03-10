@@ -20,12 +20,10 @@ class IXAFormatter(logging.Formatter):
                                            datefmt=self.DATE_FORMAT)
 
     def format(self, record):
-        record = copy(record)
-
         # strip newlines
-        record.message = record.message.replace('\n', ' ')
-
-        return super(IXAFormatter, self).format(record)
+        message = super(IXAFormatter, self).format(record)
+        message = message.replace('\n', ' ')
+        return message
 
 
 class SysLogHandler(logging.handlers.SysLogHandler):

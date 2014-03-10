@@ -2,12 +2,19 @@
 Standard config for loading Django settings from Docker
 """
 
-import os
 import logging
 import logging.handlers
+import os
 import socket
+import sys
 
 import dj_database_url
+
+# this dark incantation copies the settings set so far in the main config
+# into our address space
+locals().update(vars(sys.modules[os.environ['DJANGO_SETTINGS_MODULE']]))
+
+assert BASE_DIR, "BASE_DIR must be defined"
 
 # Environment
 ENVIRONMENT = os.environ.get('ENVIRONMENT', None)
@@ -126,3 +133,15 @@ else:
     # show request logs on the console
     for logger in LOGGING['loggers'].values():
         logger['handlers'].insert(0, 'console')
+
+
+# File locations
+if ENVIRONMENT == 'dev_local':
+    STORAGE_DIR = BASE_DIR
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+else:
+    STORAGE_DIR = '/storage'
+    STATIC_ROOT = '/static'
+
+MEDIA_ROOT = os.path.join(STORAGE_DIR, 'media')
