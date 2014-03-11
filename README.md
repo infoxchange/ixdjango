@@ -31,6 +31,34 @@ Clear specified app's models of data
 Uses the settings `NEW_RELIC_CONFIG`, `NEW_RELIC_ENV` and `NEW_RELIC_API_KEY`
 to inform New Relic of an application deployment.
 
+Docker Settings
+---------------
+
+`ixdjango.docker_settings` provides Django settings module that presets
+variables exposed by the Docker environment into your Django application.
+
+Use it as follows:
+
+    import os
+
+    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+    # Docker container defaults
+    # pylint:disable=unused-wildcard-import,import-error,no-name-in-module
+    from ixdjango.docker_settings import *
+    # pylint:enable=unused-wildcard-import,import-error,no-name-in-module
+
+Provides the following configuration variables:
+
+ * `DEBUG`, `TEMPLATE_DEBUG`, `TASTYPIE_FULL_DEBUG`
+ * `DATABASES['default']`
+ * `X_FORWARDED_HOST`, `SECURE_PROXY_SSL_HEADER`
+ * `MY_SITE_DOMAIN`, `ALLOWED_HOSTS`, `SITE_URL`
+ * `EMAIL_HOST`, `EMAIL_PORT`, `DEFAULT_FROM_EMAIL`
+ * `LOGGING`
+ * `STORAGE_DIR`, `NGINX_STATIC_DIR` (Docker storage locations)
+ * `STATIC_ROOT`, `MEDIA_ROOT`
+
 
 Dependencies
 ------------

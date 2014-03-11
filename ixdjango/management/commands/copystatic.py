@@ -1,7 +1,5 @@
 """
-Management command to execute several deployment steps with a single command.
-More to save flux in the puppet manifest than any effort to reduce typing
-required.
+Copy static files to nginx location
 
 .. moduleauthor:: Infoxchange Development Team <development@infoxchange.net.au>
 
