@@ -23,6 +23,7 @@ class IXAFormatter(logging.Formatter):
         # strip newlines
         message = super(IXAFormatter, self).format(record)
         message = message.replace('\n', ' ')
+        message += '\n'
         return message
 
 
