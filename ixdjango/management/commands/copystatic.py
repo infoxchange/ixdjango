@@ -7,12 +7,32 @@ required.
 
 """
 import logging
-from shutil import copytree
+import os
+from shutil import copy2, copystat
 
 from django.conf import settings
 from django.core.management.base import NoArgsCommand
 
 LOGGER = logging.getLogger(__name__)
+
+
+def copytree(src, dst):
+    """
+    A version of copytree I don't hate
+    """
+
+    if not (os.path.exists(dst) and os.path.isdir(dst)):
+        os.makedirs(dst)
+        copystat(src, dst)
+
+    for name in os.listdir(src):
+        srcname = os.path.join(src, name)
+        dstname = os.path.join(dst, name)
+
+        if os.path.isdir(srcname):
+            copytree(srcname, dstname)
+        else:
+            copy2(srcname, dstname)
 
 
 class Command(NoArgsCommand):
