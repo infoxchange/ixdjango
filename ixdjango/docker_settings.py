@@ -138,10 +138,11 @@ else:
 # File locations
 if ENVIRONMENT == 'dev_local':
     STORAGE_DIR = BASE_DIR
-    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+    NGINX_STATIC_DIR = None
 
 else:
     STORAGE_DIR = '/storage'
-    STATIC_ROOT = '/static'
+    NGINX_STATIC_DIR = '/static'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = os.path.join(STORAGE_DIR, 'media')
