@@ -5,14 +5,17 @@ Logging Handler
 import logging
 import logging.handlers
 import socket
-from copy import copy
 
 
 class IXAFormatter(logging.Formatter):
+    """
+    A formatter for IXA logging environment.
+    """
 
-    FORMAT = '%(asctime)s {hostname} %(name)s[%(process)d]: %(message)s'.format(
-        hostname=socket.gethostname(),
-    )
+    FORMAT = '%(asctime)s {hostname} %(name)s[%(process)d]: %(message)s'.\
+        format(
+            hostname=socket.gethostname(),
+        )
     DATE_FORMAT = '%b %d %H:%M:%S'
 
     def __init__(self):
