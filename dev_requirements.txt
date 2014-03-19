@@ -1,0 +1,7 @@
+Django
+South
+dj-database-url
+httplib2
+newrelic
+pep8
+pylint

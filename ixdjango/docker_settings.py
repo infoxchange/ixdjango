@@ -10,14 +10,15 @@ import sys
 
 import dj_database_url
 
-# this dark incantation copies the settings set so far in the main config
-# into our address space
-locals().update(vars(sys.modules[os.environ['DJANGO_SETTINGS_MODULE']]))
+# Copy BASE_DIR from the main configuration
+BASE_DIR = sys.modules[os.environ['DJANGO_SETTINGS_MODULE']].BASE_DIR
 
 assert BASE_DIR, "BASE_DIR must be defined"
 
 # Environment
 ENVIRONMENT = os.environ.get('ENVIRONMENT', None)
+if ENVIRONMENT == 'dev_local':
+    DEVNAME = os.environ['DEVNAME']
 
 # Debugging
 DEBUG = ENVIRONMENT in ('dev_local', 'dev', 'test')
@@ -31,6 +32,10 @@ if ENVIRONMENT:
     }
 else:
     DATABASES = {}
+
+# Elasticsearch
+ELASTICSEARCH_INDEX_NAME = os.environ.get('ELASTICSEARCH_INDEX_NAME')
+ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URLS', '').split('|')
 
 # Trust nginx
 USE_X_FORWARDED_HOST = True
