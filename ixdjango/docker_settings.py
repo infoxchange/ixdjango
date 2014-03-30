@@ -124,7 +124,7 @@ if ENVIRONMENT not in (None, 'dev_local',):
     })[os.environ.get('SYSLOG_PROTO', 'udp')]
 
     LOGGING['handlers']['kibana'] = {
-        'level': 'INFO',
+        'level': 'DEBUG' if DEBUG else 'INFO',
         'class': 'ixdjango.logging_.SysLogHandler',
         'address': LOGGING_ADDRESS,
         'socktype': LOGGING_SOCKTYPE,
