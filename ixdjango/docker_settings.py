@@ -112,7 +112,7 @@ LOGGING = {
 }
 
 if ENVIRONMENT not in (None, 'dev_local',):
-    # configure Kibana on sites other than dev_local
+    # configure logstash on sites other than dev_local
     # N.B. Travis is also running as dev_local
 
     LOGGING_ADDRESS = (os.environ.get('SYSLOG_SERVER', 'localhost'),
@@ -123,7 +123,7 @@ if ENVIRONMENT not in (None, 'dev_local',):
         'udp': socket.SOCK_DGRAM,
     })[os.environ.get('SYSLOG_PROTO', 'udp')]
 
-    LOGGING['handlers']['kibana'] = {
+    LOGGING['handlers']['logstash'] = {
         'level': 'DEBUG' if DEBUG else 'INFO',
         'class': 'ixdjango.logging_.SysLogHandler',
         'address': LOGGING_ADDRESS,
@@ -131,9 +131,9 @@ if ENVIRONMENT not in (None, 'dev_local',):
         'formatter': 'ixa',
     }
 
-    # send all logs to Kibana
+    # send all logs to logstash
     for logger in LOGGING['loggers'].values():
-        logger['handlers'].insert(0, 'kibana')
+        logger['handlers'].insert(0, 'logstash')
 else:
     # show request logs on the console
     for logger in LOGGING['loggers'].values():
