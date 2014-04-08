@@ -159,3 +159,14 @@ MEDIA_ROOT = os.path.join(STORAGE_DIR, 'media')
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
+
+
+# Memcache
+if 'MEMCACHE_HOSTS' in os.environ:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': os.environ['MEMCACHE_HOSTS'].split('|'),
+            'KEY_PREFIX': os.environ['MEMCACHE_PREFIX'],
+        },
+    }
