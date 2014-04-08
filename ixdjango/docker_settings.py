@@ -107,7 +107,12 @@ LOGGING = {
             'level': 'WARNING',
             'handlers': [],
             'propagate': True,
-        }
+        },
+        'newrelic': {
+            'level': 'INFO',
+            'handlers': [],
+            'propagate': True,
+        },
     },
 }
 
