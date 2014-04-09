@@ -162,7 +162,9 @@ MEDIA_URL = '/media/'
 
 
 # Memcache
-if 'MEMCACHE_HOSTS' in os.environ:
+try:
+    import memcache
+
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
@@ -170,3 +172,6 @@ if 'MEMCACHE_HOSTS' in os.environ:
             'KEY_PREFIX': os.environ['MEMCACHE_PREFIX'],
         },
     }
+
+except ImportError, KeyError:
+    pass
