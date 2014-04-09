@@ -173,5 +173,5 @@ try:
         },
     }
 
-except ImportError, KeyError:
+except (ImportError, KeyError):
     pass
