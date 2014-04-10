@@ -163,7 +163,7 @@ MEDIA_URL = '/media/'
 
 # Memcache
 try:
-    import memcache
+    import memcache  # pylint:disable=unused-import
 
     CACHES = {
         'default': {
