@@ -107,7 +107,12 @@ LOGGING = {
             'level': 'WARNING',
             'handlers': [],
             'propagate': True,
-        }
+        },
+        'newrelic': {
+            'level': 'INFO',
+            'handlers': [],
+            'propagate': True,
+        },
     },
 }
 
@@ -154,3 +159,19 @@ MEDIA_ROOT = os.path.join(STORAGE_DIR, 'media')
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
+
+
+# Memcache
+try:
+    import memcache  # pylint:disable=unused-import
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': os.environ['MEMCACHE_HOSTS'].split('|'),
+            'KEY_PREFIX': os.environ['MEMCACHE_PREFIX'],
+        },
+    }
+
+except (ImportError, KeyError):
+    pass
