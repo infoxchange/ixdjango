@@ -5,17 +5,11 @@ Management command to enable New Relic notification of deployments
 
 """
 
-import pwd
 import os
-from subprocess import Popen, PIPE
-from urllib import urlencode
-
-from httplib2 import Http, proxy_info_from_environment
+from subprocess import call, Popen, PIPE
 
 from django.conf import settings
 from django.core.management.base import NoArgsCommand
-
-import newrelic.agent
 
 
 class Command(NoArgsCommand):
@@ -23,42 +17,26 @@ class Command(NoArgsCommand):
     Notify New Relic of the new version
     """
 
-    URL = 'https://rpm.newrelic.com/deployments.xml'
-
     def handle_noargs(self, **options):
-        newrelic.agent.initialize(
-            settings.NEW_RELIC_CONFIG,
-            settings.NEW_RELIC_ENV
-        )
-
-        config = newrelic.agent.global_settings()
-
-        if not config.monitor_mode:
-            return
-
         # get the current git version
         git = Popen(('git', 'describe'), stdout=PIPE)
         ver, _ = git.communicate()
         ver = ver.strip()
 
-        # get the current user
-        user = pwd.getpwuid(os.getuid())
+        # The the tagger name and email
+        git = Popen(('git', 'log', ver, '--format=%ae', '-1'), stdout=PIPE)
+        username, _ = git.communicate()
+        username = username.strip()
 
-        headers = {
-            'x-api-key': settings.NEW_RELIC_API_KEY,
-        }
-        post = {
-            'deployment[app_name]': config.app_name,
-            'deployment[revision]': ver,
-            'deployment[user]': '%s (%s)' % (user.pw_gecos, user.pw_name),
-        }
+        ini_file = os.environ.get('NEW_RELIC_CONFIG_FILE',
+                                  settings.NEW_RELIC_CONFIG)
 
         print "Informing New Relic...",
 
-        # post this data
-        http = Http(proxy_info=proxy_info_from_environment())
-        response, _ = http.request(self.URL, 'POST',
-                                   headers=headers,
-                                   body=urlencode(post))
-
-        print response['status']
+        call(['newrelic-admin',
+              'record-deploy',
+              ini_file,
+              ver,  # description
+              ver,  # revision
+              '',  # changelog
+              username])
