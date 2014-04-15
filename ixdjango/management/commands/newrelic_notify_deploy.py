@@ -8,6 +8,7 @@ Management command to enable New Relic notification of deployments
 import os
 from subprocess import call, Popen, PIPE
 
+from django.conf import settings
 from django.core.management.base import NoArgsCommand
 
 
@@ -23,12 +24,12 @@ class Command(NoArgsCommand):
         ver = ver.strip()
 
         # The the tagger name and email
-        git = Popen(('git', 'show', ver), stdout=PIPE)
-        desc, _ = git.communicate()
-        match = re.search('Tagger: (.*) <(.*)>', desc)
-        _, username = match.groups()
+        git = Popen(('git', 'log', ver, '--format=%ae', '-1'), stdout=PIPE)
+        username, _ = git.communicate()
+        username = username.strip()
 
-        ini_file = './conf/newrelic.ini'
+        ini_file = os.environ.get('NEW_RELIC_CONFIG_FILE',
+                                  settings.NEW_RELIC_CONFIG)
 
         print "Informing New Relic...",
 
@@ -37,5 +38,5 @@ class Command(NoArgsCommand):
               ini_file,
               ver,  # description
               ver,  # revision
-              '""',  # changelog
+              '',  # changelog
               username])
