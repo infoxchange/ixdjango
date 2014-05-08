@@ -15,14 +15,14 @@ class MasterSlaveRouter(object):
     MASTER = 'default'
     SLAVE = 'standby'
 
-    def db_for_read(self, model, *hints):
+    def db_for_read(self, model, **hints):
         """
         Return the DB to use for reads
         """
 
         return self.SLAVE
 
-    def db_for_write(self, model, *hints):
+    def db_for_write(self, model, **hints):
         """
         Return the DB to use for writes
         """
