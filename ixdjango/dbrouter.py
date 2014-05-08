@@ -29,4 +29,4 @@ class MasterSlaveRouter(object):
         return None
 
     def allow_syncdb(self, db, model):
-        return db == MASTER
+        return db == self.MASTER
