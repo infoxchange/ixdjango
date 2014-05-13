@@ -7,10 +7,10 @@ import re
 from subprocess import PIPE, Popen
 
 
-def random_string(
-    length=10,
-    chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-):
+ALPHANUMERIC = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+
+
+def random_string(length=10, chars=ALPHANUMERIC):
     """
     Generates a random string of length specified and using supplied chars.
     Useful for salting hashing functions

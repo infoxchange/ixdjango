@@ -19,7 +19,11 @@ class Command(BaseCommand):
     A command to clear app data.
     """
 
+    help = ('Cleans the specified applications\' tables to a pristine state.')
+
     def handle(self, *apps, **options):
+        verbosity = int(options['verbosity'])
+
         models = []
         for app in apps:
             app_models = [
@@ -29,12 +33,14 @@ class Command(BaseCommand):
                 if model._meta.managed
             ]
             models += app_models
-            print "Found %d model(s) for %s" % (len(app_models), app)
+            if verbosity >= 1:
+                print "Found %d model(s) for %s" % (len(app_models), app)
 
         db.start_transaction()
 
         for model in models:
-            print "Clearing %s table %s" % (model, model._meta.db_table)
+            if verbosity >= 1:
+                print "Clearing %s table %s" % (model, model._meta.db_table)
             db.clear_table(model._meta.db_table)
             sql = connection.ops.sequence_reset_sql(no_style(), [model])
             for cmd in sql:
@@ -42,4 +48,5 @@ class Command(BaseCommand):
 
         db.commit_transaction()
 
-        print "Cleared %d models" % len(models)
+        if verbosity >= 1:
+            print "Cleared %d models" % len(models)
