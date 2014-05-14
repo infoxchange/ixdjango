@@ -140,15 +140,15 @@ if ENVIRONMENT not in (None, 'dev_local',):
     for logger in LOGGING['loggers'].values():
         logger['handlers'].insert(0, 'logstash')
 
-    console_output_disabled = True  # Default; may be overridden
+    CONSOLE_OUTPUT_DISABLED = True  # Default; may be overridden
 
 else:
-    console_output_disabled = False  # Default; may be overridden
+    CONSOLE_OUTPUT_DISABLED = False  # Default; may be overridden
 
-console_output_disabled = bool(os.environ.get('CONSOLE_OUTPUT_DISABLED',
-                                              console_output_disabled))
+CONSOLE_OUTPUT_DISABLED = bool(os.environ.get('CONSOLE_OUTPUT_DISABLED',
+                                              CONSOLE_OUTPUT_DISABLED))
 
-if not console_output_disabled:
+if not CONSOLE_OUTPUT_DISABLED:
     # show request logs on the console
     for logger in LOGGING['loggers'].values():
         logger['handlers'].insert(0, 'console')
