@@ -139,7 +139,16 @@ if ENVIRONMENT not in (None, 'dev_local',):
     # send all logs to logstash
     for logger in LOGGING['loggers'].values():
         logger['handlers'].insert(0, 'logstash')
+
+    console_output_disabled = True  # Default; may be overridden
+
 else:
+    console_output_disabled = False  # Default; may be overridden
+
+console_output_disabled = bool(os.environ.get('CONSOLE_OUTPUT_DISABLED',
+                                              console_output_disabled))
+
+if not console_output_disabled:
     # show request logs on the console
     for logger in LOGGING['loggers'].values():
         logger['handlers'].insert(0, 'console')
