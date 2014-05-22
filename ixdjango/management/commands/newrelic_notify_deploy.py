@@ -28,8 +28,10 @@ class Command(NoArgsCommand):
         username, _ = git.communicate()
         username = username.strip()
 
-        ini_file = os.environ.get('NEW_RELIC_CONFIG_FILE',
-                                  settings.NEW_RELIC_CONFIG)
+        try:
+            ini_file = os.environ['NEW_RELIC_CONFIG_FILE']
+        except KeyError:
+            ini_file = settings.NEW_RELIC_CONFIG
 
         print "Informing New Relic...",
 
