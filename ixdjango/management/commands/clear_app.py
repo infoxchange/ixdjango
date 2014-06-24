@@ -27,8 +27,16 @@ class Command(BaseCommand):
         models = []
         for target in targets:
             target = target.split('.')
-            if len(target) == 1:
+
+            try:
                 app, = target
+                model = None
+            except ValueError:
+                app, model = target
+
+            if model:
+                models.append(get_model(app, model))
+            else:
                 app_models = [
                     model
                     for model
@@ -38,9 +46,6 @@ class Command(BaseCommand):
                 models += app_models
                 if verbosity >= 1:
                     print "Found %d model(s) for %s" % (len(app_models), app)
-            else:
-                app, model = target
-                models.append(get_model(app, model))
 
         db.start_transaction()
 
