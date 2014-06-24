@@ -8,7 +8,7 @@ Management command to clear specified app's models of data.
 from django.core.management.base import BaseCommand
 from django.core.management.color import no_style
 from django.db import connection
-from django.db.models import get_app, get_models
+from django.db.models import get_app, get_model, get_models
 from south.db import db
 
 # pylint:disable=protected-access
@@ -21,20 +21,26 @@ class Command(BaseCommand):
 
     help = ('Cleans the specified applications\' tables to a pristine state.')
 
-    def handle(self, *apps, **options):
+    def handle(self, *targets, **options):
         verbosity = int(options['verbosity'])
 
         models = []
-        for app in apps:
-            app_models = [
-                model
-                for model
-                in get_models(get_app(app), include_auto_created=True)
-                if model._meta.managed
-            ]
-            models += app_models
-            if verbosity >= 1:
-                print "Found %d model(s) for %s" % (len(app_models), app)
+        for target in targets:
+            target = target.split('.')
+            if len(target) == 1:
+                app, = target
+                app_models = [
+                    model
+                    for model
+                    in get_models(get_app(app), include_auto_created=True)
+                    if model._meta.managed
+                ]
+                models += app_models
+                if verbosity >= 1:
+                    print "Found %d model(s) for %s" % (len(app_models), app)
+            else:
+                app, model = target
+                models.append(get_model(app, model))
 
         db.start_transaction()
 
