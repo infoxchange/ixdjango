@@ -63,7 +63,8 @@ Provides the following configuration variables:
 Dependencies
 ------------
 
-* Django: Might work on older versions but was developed for 1.3.0.
+* Django: Depends on Django 1.6, but is being ported to Django 1.7
+* Python: 2.7, but Python 3.3 support is being added
 * pep8 and pylint: Not required for functionality but we like QC before
 committing any code changes so these tools need to be available. Note that
 if you'd like to contribute, any code you write must give a clean output with
