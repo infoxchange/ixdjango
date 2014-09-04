@@ -5,13 +5,27 @@ Management command to clear specified app's models of data.
 
 """
 
+from __future__ import print_function
+
 from django.core.management.base import BaseCommand
 from django.core.management.color import no_style
-from django.db import connection
+from django.db import connection, transaction
+# pylint:disable=no-name-in-module
 from django.db.models import get_app, get_model, get_models
-from south.db import db
 
 # pylint:disable=protected-access
+
+
+real_print = print  # pylint:disable=invalid-name
+
+
+def print(*args, **kwargs):  # pylint:disable=redefined-builtin
+    """
+    Only print if required
+    """
+
+    if kwargs.pop('verbosity') >= 1:
+        real_print(*args, **kwargs)
 
 
 class Command(BaseCommand):
@@ -44,20 +58,21 @@ class Command(BaseCommand):
                     if model._meta.managed
                 ]
                 models += app_models
-                if verbosity >= 1:
-                    print "Found %d model(s) for %s" % (len(app_models), app)
+                print("Found %d model(s) for %s" % (len(app_models), app),
+                      verbosity=verbosity)
 
-        db.start_transaction()
+        with transaction.atomic():
+            for model in models:
+                print("Clearing %s table %s" % (
+                      model, model._meta.db_table),
+                      verbosity=verbosity)
 
-        for model in models:
-            if verbosity >= 1:
-                print "Clearing %s table %s" % (model, model._meta.db_table)
-            db.clear_table(model._meta.db_table)
-            sql = connection.ops.sequence_reset_sql(no_style(), [model])
-            for cmd in sql:
-                connection.cursor().execute(cmd)
+                cursor = connection.cursor()
+                cursor.execute('TRUNCATE TABLE {} CASCADE'.format(
+                    model._meta.db_table))
 
-        db.commit_transaction()
+                sql = connection.ops.sequence_reset_sql(no_style(), [model])
+                for cmd in sql:
+                    connection.cursor().execute(cmd)
 
-        if verbosity >= 1:
-            print "Cleared %d models" % len(models)
+        print("Cleared %d models" % len(models), verbosity=verbosity)
