@@ -5,4 +5,5 @@ httplib2
 newrelic
 pep8
 pylint
+pylint-mccabe
 python-memcached
