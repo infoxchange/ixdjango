@@ -10,9 +10,22 @@ from __future__ import print_function
 from django.core.management.base import BaseCommand
 from django.core.management.color import no_style
 from django.db import connection, transaction
+# pylint:disable=no-name-in-module
 from django.db.models import get_app, get_model, get_models
 
 # pylint:disable=protected-access
+
+
+real_print = print  # pylint:disable=invalid-name
+
+
+def print(*args, **kwargs):  # pylint:disable=redefined-builtin
+    """
+    Only print if required
+    """
+
+    if kwargs.pop('verbosity') >= 1:
+        real_print(*args, **kwargs)
 
 
 class Command(BaseCommand):
@@ -45,14 +58,14 @@ class Command(BaseCommand):
                     if model._meta.managed
                 ]
                 models += app_models
-                if verbosity >= 1:
-                    print("Found %d model(s) for %s" % (len(app_models), app))
+                print("Found %d model(s) for %s" % (len(app_models), app),
+                      verbosity=verbosity)
 
         with transaction.atomic():
             for model in models:
-                if verbosity >= 1:
-                    print("Clearing %s table %s" % (
-                        model, model._meta.db_table))
+                print("Clearing %s table %s" % (
+                      model, model._meta.db_table),
+                      verbosity=verbosity)
 
                 cursor = connection.cursor()
                 cursor.execute('TRUNCATE TABLE {} CASCADE'.format(
@@ -62,5 +75,4 @@ class Command(BaseCommand):
                 for cmd in sql:
                     connection.cursor().execute(cmd)
 
-        if verbosity >= 1:
-            print("Cleared %d models" % len(models))
+        print("Cleared %d models" % len(models), verbosity=verbosity)
