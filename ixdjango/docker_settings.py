@@ -84,7 +84,7 @@ LOGGING = {
     },
     'loggers': {
         'gunicorn': {
-            'level': 'INFO',
+            'level': 'DEBUG' if ENVIRONMENT == 'dev_local' else 'INFO',
             'handlers': [],
             'propagate': True,
         },
@@ -94,7 +94,7 @@ LOGGING = {
             'propagate': True,
         },
         'django.db': {
-            'level': 'WARNING',
+            'level': 'INFO' if ENVIRONMENT == 'dev_local' else 'WARNING',
             'handlers': ['mail_admins'],
             'propagate': True,
         },
@@ -104,7 +104,7 @@ LOGGING = {
             'propagate': True,
         },
         'requests': {
-            'level': 'WARNING',
+            'level': 'INFO' if ENVIRONMENT == 'dev_local' else 'WARNING',
             'handlers': [],
             'propagate': True,
         },
