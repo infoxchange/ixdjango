@@ -28,21 +28,22 @@ class Command(NoArgsCommand):
         try:
             deploy_cmds = settings.IX_DEPLOY_CMDS
         except AttributeError:
-            deploy_cmds = None
+            deploy_cmds = []
 
         # Wrap in a tuple if we were only given one command.
         if isinstance(deploy_cmds, types.StringTypes):
             deploy_cmds = (deploy_cmds,)
 
-        if deploy_cmds:
-            for cmd in deploy_cmds:
-                # interactive=False is the same as --noinput.
-                args = []
-                kwargs = {}
-                if type(cmd) is tuple:
-                    if len(cmd) == 3:
-                        (cmd, args, kwargs) = cmd
-                    else:
-                        (cmd, args) = cmd
-                kwargs.setdefault('interactive', False)
-                management.call_command(cmd, *args, **kwargs)
+        for cmd in deploy_cmds:
+            args = []
+            kwargs = {}
+            if type(cmd) is tuple:
+                if len(cmd) == 3:
+                    # pylint:disable=unbalanced-tuple-unpacking
+                    (cmd, args, kwargs) = cmd
+                    # pylint:enable=unbalanced-tuple-unpacking
+                else:
+                    (cmd, args) = cmd
+            # interactive=False is the same as --noinput.
+            kwargs.setdefault('interactive', False)
+            management.call_command(cmd, *args, **kwargs)

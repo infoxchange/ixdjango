@@ -20,6 +20,7 @@ def copytree(src, dst):
     """
 
     if not (os.path.exists(dst) and os.path.isdir(dst)):
+        LOGGER.info("Creating directory %s", dst)
         os.makedirs(dst)
         copystat(src, dst)
 
@@ -28,8 +29,10 @@ def copytree(src, dst):
         dstname = os.path.join(dst, name)
 
         if os.path.isdir(srcname):
+            LOGGER.debug("Copying directory %s", name)
             copytree(srcname, dstname)
         else:
+            LOGGER.debug("Copying file %s", name)
             copy2(srcname, dstname)
 
 
@@ -45,6 +48,7 @@ class Command(NoArgsCommand):
             static_dir = None
 
         if not static_dir:
+            LOGGER.info("static dir not defined, copy static content skipped")
             return
 
         LOGGER.info("Copying static content to %s", static_dir)
