@@ -20,7 +20,7 @@ def copytree(src, dst):
     """
 
     if not (os.path.exists(dst) and os.path.isdir(dst)):
-        LOGGER.INFO("Creating directory %s", dst)
+        LOGGER.info("Creating directory %s", dst)
         os.makedirs(dst)
         copystat(src, dst)
 
@@ -29,10 +29,10 @@ def copytree(src, dst):
         dstname = os.path.join(dst, name)
 
         if os.path.isdir(srcname):
-            LOGGER.DEBUG("Copying directory %s", name)
+            LOGGER.debug("Copying directory %s", name)
             copytree(srcname, dstname)
         else:
-            LOGGER.DEBUG("Copying file %s", name)
+            LOGGER.debug("Copying file %s", name)
             copy2(srcname, dstname)
 
 
