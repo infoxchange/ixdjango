@@ -35,7 +35,6 @@ class Command(NoArgsCommand):
             deploy_cmds = (deploy_cmds,)
 
         for cmd in deploy_cmds:
-            # interactive=False is the same as --noinput.
             args = []
             kwargs = {}
             if type(cmd) is tuple:
@@ -45,5 +44,6 @@ class Command(NoArgsCommand):
                     # pylint:enable=unbalanced-tuple-unpacking
                 else:
                     (cmd, args) = cmd
+            # interactive=False is the same as --noinput.
             kwargs.setdefault('interactive', False)
             management.call_command(cmd, *args, **kwargs)
