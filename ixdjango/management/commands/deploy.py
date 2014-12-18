@@ -40,7 +40,9 @@ class Command(NoArgsCommand):
             kwargs = {}
             if type(cmd) is tuple:
                 if len(cmd) == 3:
+                    # pylint:disable=unbalanced-tuple-unpacking
                     (cmd, args, kwargs) = cmd
+                    # pylint:enable=unbalanced-tuple-unpacking
                 else:
                     (cmd, args) = cmd
             kwargs.setdefault('interactive', False)
