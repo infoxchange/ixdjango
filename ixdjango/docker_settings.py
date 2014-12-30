@@ -24,17 +24,15 @@ TEMPLATE_DEBUG = DEBUG
 TASTYPIE_FULL_DEBUG = DEBUG
 
 # Databases
-try:
+DATABASES = {}
+
+if 'DB_DEFAULT_URL' in os.environ:
     import dj_database_url
 
     if ENVIRONMENT:
         DATABASES = {
             'default': dj_database_url.parse(os.environ['DB_DEFAULT_URL'])
         }
-    else:
-        DATABASES = {}
-except (KeyError, ImportError):
-    pass
 
 # Elasticsearch
 ELASTICSEARCH_INDEX_NAME = os.environ.get('ELASTICSEARCH_INDEX_NAME')
