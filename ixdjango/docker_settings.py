@@ -8,8 +8,6 @@ import os
 import socket
 import sys
 
-import dj_database_url
-
 # Copy BASE_DIR from the main configuration
 BASE_DIR = sys.modules[os.environ['DJANGO_SETTINGS_MODULE']].BASE_DIR
 
@@ -26,12 +24,17 @@ TEMPLATE_DEBUG = DEBUG
 TASTYPIE_FULL_DEBUG = DEBUG
 
 # Databases
-if ENVIRONMENT:
-    DATABASES = {
-        'default': dj_database_url.parse(os.environ['DB_DEFAULT_URL'])
-    }
-else:
-    DATABASES = {}
+try:
+    import dj_database_url
+
+    if ENVIRONMENT:
+        DATABASES = {
+            'default': dj_database_url.parse(os.environ['DB_DEFAULT_URL'])
+        }
+    else:
+        DATABASES = {}
+except (KeyError, ImportError):
+    pass
 
 # Elasticsearch
 ELASTICSEARCH_INDEX_NAME = os.environ.get('ELASTICSEARCH_INDEX_NAME')
