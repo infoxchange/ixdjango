@@ -14,8 +14,9 @@ setup(
     description='Management commands for deploying Django projects.',
     long_description=open('README.md').read(),
     install_requires=[
-        "Django >= 1.3.0",
+        "Django >= 1.7.0",
         "httplib2",
+        "future",
     ],
     tests_require=[
         "pep8 >= 1.4.6",

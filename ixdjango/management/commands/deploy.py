@@ -6,8 +6,13 @@ required.
 .. moduleauthor:: Infoxchange Development Team <development@infoxchange.net.au>
 
 """
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
+from future.builtins import *
+from future.standard_library import install_aliases
+install_aliases()
+
 import logging
-import types
 
 from django.core.management.base import NoArgsCommand
 from django.core import management
@@ -31,7 +36,7 @@ class Command(NoArgsCommand):
             deploy_cmds = []
 
         # Wrap in a tuple if we were only given one command.
-        if isinstance(deploy_cmds, types.StringTypes):
+        if isinstance(deploy_cmds, str):
             deploy_cmds = (deploy_cmds,)
 
         for cmd in deploy_cmds:

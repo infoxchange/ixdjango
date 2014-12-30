@@ -1,6 +1,7 @@
 Django
 South
 dj-database-url
+future
 httplib2
 newrelic
 pep8
