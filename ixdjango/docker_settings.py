@@ -43,10 +43,8 @@ USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Allowed hosts
-try:
-    ALLOWED_HOSTS = os.environ.get('SITE_DOMAIN').split('|')
-except AttributeError:
-    pass
+ALLOWED_HOSTS = os.environ['SITE_DOMAIN'].split('|')
+MY_SITE_DOMAIN = ALLOWED_HOSTS[0]
 
 # Site domain and URL
 MY_SITE_DOMAIN = os.environ.get('SITE_DOMAIN')
