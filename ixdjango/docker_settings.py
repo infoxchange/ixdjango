@@ -42,11 +42,14 @@ ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URLS', '').split('|')
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# Allowed hosts
+try:
+    ALLOWED_HOSTS = os.environ.get('SITE_DOMAIN').split('|')
+except AttributeError:
+    pass
+
 # Site domain and URL
 MY_SITE_DOMAIN = os.environ.get('SITE_DOMAIN')
-if MY_SITE_DOMAIN:
-    ALLOWED_HOSTS = (MY_SITE_DOMAIN,)
-
 SITE_URL = '{0}://{1}'.format(os.environ.get('SITE_PROTOCOL'), MY_SITE_DOMAIN)
 
 # Email
