@@ -45,7 +45,8 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Allowed hosts, Site domain and URL
 ALLOWED_HOSTS = os.environ['SITE_DOMAIN'].split('|')
 MY_SITE_DOMAIN = ALLOWED_HOSTS[0]
-SITE_URL = '{0}://{1}'.format(os.environ.get('SITE_PROTOCOL'), MY_SITE_DOMAIN)
+SITE_URL = '{0}://{1}'.format(os.environ.get('SITE_PROTOCOL', ''),
+                              MY_SITE_DOMAIN)
 
 # Email
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
