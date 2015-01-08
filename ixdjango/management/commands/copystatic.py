@@ -27,7 +27,7 @@ class Command(NoArgsCommand):
                               "copy static content skipped")
             return
 
-        self.stdout.write("Copying static content to %s", static_dir)
+        self.stdout.write("Copying static content to %s" % static_dir)
 
         self.copytree(settings.STATIC_ROOT, static_dir)
 
@@ -37,7 +37,7 @@ class Command(NoArgsCommand):
         """
 
         if not (os.path.exists(dst) and os.path.isdir(dst)):
-            self.stdout.write("Creating directory %s", dst)
+            self.stdout.write("Creating directory %s" % dst)
             os.makedirs(dst)
             copystat(src, dst)
 
@@ -46,8 +46,8 @@ class Command(NoArgsCommand):
             dstname = os.path.join(dst, name)
 
             if os.path.isdir(srcname):
-                self.stdout.write("Copying directory %s", name)
+                self.stdout.write("Copying directory %s" % name)
                 self.copytree(srcname, dstname)
             else:
-                self.stdout.write("Copying file %s", name)
+                self.stdout.write("Copying file %s" % name)
                 copy2(srcname, dstname)
