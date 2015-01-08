@@ -4,7 +4,6 @@ Copy static files to nginx location
 .. moduleauthor:: Infoxchange Development Team <development@infoxchange.net.au>
 
 """
-import logging
 import os
 from shutil import copy2, copystat
 
@@ -31,7 +30,6 @@ class Command(NoArgsCommand):
         self.stdout.write("Copying static content to %s", static_dir)
 
         self.copytree(settings.STATIC_ROOT, static_dir)
-
 
     def copytree(self, src, dst):
         """
