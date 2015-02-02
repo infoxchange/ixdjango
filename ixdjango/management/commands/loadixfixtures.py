@@ -39,3 +39,8 @@ class Command(NoArgsCommand):
                 *ix_fixtures,
                 interactive=False
             )
+        else:
+            print ("loadixfixtures does nothing unless settings.IX_FIXTURES "
+                   "has been configured. Could it be that this application "
+                   "does not use loadixfixtures?\n\n"
+                   "Have you tried `./manage.py loaddata` instead?")
