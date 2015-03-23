@@ -23,6 +23,16 @@ DEBUG = ENVIRONMENT in ('dev_local', 'dev', 'test')
 TEMPLATE_DEBUG = DEBUG
 TASTYPIE_FULL_DEBUG = DEBUG
 
+# Trust nginx
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Allowed hosts, Site domain and URL
+ALLOWED_HOSTS = os.environ.get('SITE_DOMAIN', '').split('|')
+MY_SITE_DOMAIN = ALLOWED_HOSTS[0]
+SITE_URL = '{0}://{1}'.format(os.environ.get('SITE_PROTOCOL', ''),
+                              MY_SITE_DOMAIN)
+
 # Databases
 DATABASES = {}
 
@@ -38,15 +48,20 @@ if 'DB_DEFAULT_URL' in os.environ:
 ELASTICSEARCH_INDEX_NAME = os.environ.get('ELASTICSEARCH_INDEX_NAME')
 ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URLS', '').split('|')
 
-# Trust nginx
-USE_X_FORWARDED_HOST = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# Memcache
+try:
+    import memcache  # pylint:disable=unused-import,import-error
 
-# Allowed hosts, Site domain and URL
-ALLOWED_HOSTS = os.environ.get('SITE_DOMAIN', '').split('|')
-MY_SITE_DOMAIN = ALLOWED_HOSTS[0]
-SITE_URL = '{0}://{1}'.format(os.environ.get('SITE_PROTOCOL', ''),
-                              MY_SITE_DOMAIN)
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': os.environ['MEMCACHE_HOSTS'].split('|'),
+            'KEY_PREFIX': os.environ['MEMCACHE_PREFIX'],
+        },
+    }
+
+except (ImportError, KeyError):
+    pass
 
 # Email
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
@@ -168,19 +183,3 @@ MEDIA_ROOT = os.path.join(STORAGE_DIR, 'media')
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
-
-
-# Memcache
-try:
-    import memcache  # pylint:disable=unused-import,import-error
-
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-            'LOCATION': os.environ['MEMCACHE_HOSTS'].split('|'),
-            'KEY_PREFIX': os.environ['MEMCACHE_PREFIX'],
-        },
-    }
-
-except (ImportError, KeyError):
-    pass
