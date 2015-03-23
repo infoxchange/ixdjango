@@ -9,8 +9,6 @@ required.
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 from future.builtins import *
-from future.standard_library import install_aliases
-install_aliases()
 
 import logging
 
@@ -42,7 +40,7 @@ class Command(NoArgsCommand):
         for cmd in deploy_cmds:
             args = []
             kwargs = {}
-            if type(cmd) is tuple:
+            if isinstance(cmd, (list, tuple)):
                 if len(cmd) == 3:
                     # pylint:disable=unbalanced-tuple-unpacking
                     (cmd, args, kwargs) = cmd

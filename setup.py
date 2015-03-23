@@ -19,8 +19,8 @@ setup(
         "future",
     ],
     tests_require=[
-        "pep8 >= 1.4.6",
-        "pylint >= 0.28.0",
+        "pep8 >= 1.6.2",
+        "pylint >= 1.4.1",
         "pylint-mccabe >= 0.1.3",
     ],
 )
