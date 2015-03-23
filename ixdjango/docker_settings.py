@@ -7,11 +7,13 @@ import logging.handlers
 import os
 import socket
 import sys
+import warnings
 
 # Copy BASE_DIR from the main configuration
-BASE_DIR = sys.modules[os.environ['DJANGO_SETTINGS_MODULE']].BASE_DIR
+BASE_DIR = getattr(
+    sys.modules[os.environ['DJANGO_SETTINGS_MODULE']], 'BASE_DIR', None)
 
-assert BASE_DIR, "BASE_DIR must be defined"
+assert BASE_DIR, "BASE_DIR setting must be defined."
 
 # Environment
 ENVIRONMENT = os.environ.get('ENVIRONMENT', None)
@@ -67,6 +69,20 @@ except (ImportError, KeyError):
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
 EMAIL_PORT = os.environ.get('EMAIL_PORT', 25)
 DEFAULT_FROM_EMAIL = 'do.not.reply@%s' % MY_SITE_DOMAIN
+
+# Secret key
+if not hasattr(
+        sys.modules[os.environ['DJANGO_SETTINGS_MODULE']],
+        'SECRET_KEY'
+):
+    warnings.warn((
+        "Please define SECRET_KEY before importing {0}, as a fallback "
+        "for when the environment variable is not available."
+    ).format(__name__))
+try:
+    SECRET_KEY = os.environ.pop('SECRET_KEY')
+except KeyError:
+    pass
 
 # Logging
 LOGGING = {
