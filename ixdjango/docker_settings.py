@@ -80,7 +80,8 @@ if not hasattr(
         "for when the environment variable is not available."
     ).format(__name__))
 try:
-    SECRET_KEY = os.environ.pop('SECRET_KEY')
+    if os.environ.get('SECRET_KEY'):
+        SECRET_KEY = os.environ.pop('SECRET_KEY')
 except KeyError:
     pass
 
