@@ -6,9 +6,11 @@ staging, etc.
 .. moduleauthor:: Infoxchange Development Team <development@infoxchange.net.au>
 
 """
-import logging
-import types
+from __future__ import print_function
 
+import logging
+
+import six
 from django.core.management.base import NoArgsCommand
 from django.core import management
 from django.conf import settings
@@ -29,18 +31,18 @@ class Command(NoArgsCommand):
             ix_fixtures = None
 
         # Wrap in an tuple if we were only given one command.
-        if isinstance(ix_fixtures, types.StringTypes):
+        if isinstance(ix_fixtures, six.string_types):
             ix_fixtures = (ix_fixtures,)
 
         if ix_fixtures:
-            print "Loading IX_FIXTURES: {0}".format(','.join(ix_fixtures))
+            print("Loading IX_FIXTURES: {0}".format(','.join(ix_fixtures)))
             management.call_command(
                 "loaddata",
                 *ix_fixtures,
                 interactive=False
             )
         else:
-            print ("loadixfixtures does nothing unless settings.IX_FIXTURES "
-                   "has been configured. Could it be that this application "
-                   "does not use loadixfixtures?\n\n"
-                   "Have you tried `./manage.py loaddata` instead?")
+            print("loadixfixtures does nothing unless settings.IX_FIXTURES "
+                  "has been configured. Could it be that this application "
+                  "does not use loadixfixtures?\n\n"
+                  "Have you tried `./manage.py loaddata` instead?")
