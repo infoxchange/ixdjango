@@ -1,9 +1,11 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # pylint:disable=invalid-name
 """
 Git pre-commit hook for performing quality checks on python code using pep8
 and pylint
 """
+
+from __future__ import print_function
 
 import atexit
 
@@ -29,23 +31,20 @@ import tempfile
 _PYLINT_PASS_THRESHOLD = 10
 
 PEP8_CONF = 'conf/pep8.conf'
+
 PYLINT_CONF = 'conf/pylint.conf'
+
 JSHINT_CONF = 'conf/jshint.conf'
-RECESS_CONF = 'conf/recess.conf'
 
 
 def output(command):
     """
     Read the command output regardless of the exit code
     """
-    try:
-        command = command.split()
-    except AttributeError:
-        pass
-
+    command = command.split()
     sub = Popen(command, stdout=PIPE)
     sub.wait()
-    return sub.stdout.read()
+    return sub.stdout.read().decode()
 
 
 class Main(object):
@@ -67,8 +66,6 @@ class Main(object):
 
         import pep8
 
-        print "PEP8...",
-
         pep_opts = {}
         if os.path.exists(PEP8_CONF):
             pep_opts['config_file'] = PEP8_CONF
@@ -77,15 +74,13 @@ class Main(object):
         report = style.check_files((self.index,))
         count = report.total_errors
         if count > 0:
-            print "Project failed pep8 check: %d error(s)." % count
+            print("Project failed pep8 check: %d error(s)." % count)
             cmd = "pep8 "
             if 'config_file' in pep_opts:
                 cmd += "--config=%s " % pep_opts['config_file']
             cmd += "."
-            print "Re-run with:\n%s\n" % cmd
+            print("Re-run with:\n%s\n" % cmd)
             return False
-
-        print "OK"
 
         return True
 
@@ -93,8 +88,6 @@ class Main(object):
         """
         Run PyLint on the project.
         """
-
-        print "PyLint...",
 
         # Build a list of targets
         targets = []
@@ -105,6 +98,7 @@ class Main(object):
             if not any(file_.startswith(m) for m in modules):
                 targets.append(file_)
 
+        ok = True
         for target in targets:
             cmd = 'pylint'
 
@@ -119,16 +113,16 @@ class Main(object):
             # Get the rating from the result
             #
             rating = pylint_rating(result)
-            if rating < _PYLINT_PASS_THRESHOLD:
-                print "%s failed PyLint check (scored %s, min allowed is %s)" \
+            if rating is not None and rating < _PYLINT_PASS_THRESHOLD:
+                print(result)
+                ok = False
+                print(
+                    "%s failed PyLint check (scored %s, min allowed is %s)"
                     % (target, rating, _PYLINT_PASS_THRESHOLD)
-                print result
-                print "Re-run with:\n%s\n" % (cmd % '')
-                return False
+                )
+                print("Re-run with:\n%s\n" % (cmd % ''))
 
-        print "OK"
-
-        return True
+        return ok
 
     def jshint(self):
         """
@@ -138,55 +132,15 @@ class Main(object):
 
         jsargs = ('jshint',)
 
-        if not os.path.exists(JSHINT_CONF):
-            return True
-
-        jsargs += ('-c', JSHINT_CONF)
-
-        print "JSHint...",
+        if os.path.exists(JSHINT_CONF):
+            jsargs += ('-c', JSHINT_CONF)
 
         try:
             check_call(jsargs + tuple(self.changed_js_files()))
         except CalledProcessError:
-            print "JSHint failed"
-            print "Re-run with:\n%s\n" % (' '.join(jsargs),)
+            print("JSHint failed")
+            print("Re-run with:\n%s\n" % (' '.join(jsargs),))
             return False
-
-        print "OK"
-
-        return True
-
-    def recess(self):
-        """
-        Run recess on the project.
-        Nothing short of perfect will do.
-        """
-
-        recessargs = ('recess',)
-        files = tuple(self.changed_style_files())
-
-        if not files:
-            return True
-
-        if not os.path.exists(RECESS_CONF):
-            return True
-
-        print "ReCeSS...",
-
-        recessargs += ('--config', RECESS_CONF)
-        recessargs += files
-
-        try:
-            outp = output(recessargs)
-            # recess doesn't do exit codes :-/
-            assert 'STATUS: Perfect!' in outp
-        except (CalledProcessError, AssertionError):
-            print "ReCSS failed"
-            print outp
-            print "Re-run with:\n%s\n" % (' '.join(recessargs),)
-            return False
-
-        print "OK"
 
         return True
 
@@ -221,11 +175,10 @@ class Main(object):
                 return False
             if filename.endswith('.py'):
                 return True
-            try:
-                first_line = open(filename, 'r').next().strip()
-                return '#!' in first_line and 'python' in first_line
-            except StopIteration:
-                return False
+
+            with open(filename, 'rb') as file_:
+                first_line = file_.readline().strip()
+            return b'#!' in first_line and b'python' in first_line
 
         try:
             return self._changed_py_files
@@ -267,39 +220,6 @@ class Main(object):
                 [f for f in self.changed_files() if is_js_file(f)]
             return self._changed_js_files
 
-    def changed_style_files(self):
-        """
-        A list of style files changed in the index
-        """
-
-        try:
-            with open('.recessignore') as file_:
-                ignore = tuple(f.strip() for f in file_.readlines())
-        except IOError:
-            ignore = ()
-
-        def is_style_file(filename):
-            """
-            Determine whether a file is a CSS/LESS file
-            """
-            if not os.path.exists(filename):
-                return False
-            elif filename.startswith(ignore):
-                return False
-            elif filename.endswith('.css') or \
-                 filename.endswith('.less'):
-                return True
-            else:
-                return False
-
-        try:
-            return self._changed_style_files
-        except AttributeError:
-            # pylint:disable=attribute-defined-outside-init
-            self._changed_style_files = \
-                [f for f in self.changed_files() if is_style_file(f)]
-            return self._changed_style_files
-
     def modules(self):
         """
         A list of Python modules in the checkout.
@@ -323,25 +243,17 @@ class Main(object):
         """
         if not self.changed_py_files() and \
            not self.changed_js_files() and \
-           not self.changed_style_files() and \
            not self.force:
-            print "No source files changed. Pre-commit tests skipped."
+            print("No source files changed. Pre-commit tests skipped.")
             return True
-        if 'VIRTUAL_ENV' not in os.environ:
-            print "Virtual environment needs to be activated to run the " + \
-                  "pre-commit tests."
-            return False
         atexit.register(self.cleanup)
         self.copy_index()
-        good = [func() for func in (self.pep8,
-                                    self.pylint,
-                                    self.jshint,
-                                    self.recess)]
+        good = [func() for func in (self.pep8, self.pylint)]
         if all(good):
-            print "Your code looks good. Continuing with commit."
+            print("Your code looks good. Continuing with commit.")
             return True
         else:
-            print "Pre-commit tests failed."
+            print("Pre-commit tests failed.")
             return False
 
 
@@ -349,6 +261,9 @@ def pylint_rating(result):
     """
     Extract the rating rating from PyLint output.
     """
+
+    if result == '':
+        return None
     rating = re.search(r'Your code has been rated at ([-\d\.]+)/10', result)
     return float(rating.group(1))
 

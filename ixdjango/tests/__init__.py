@@ -2,6 +2,8 @@
 Hook into the test runner
 """
 
+from __future__ import print_function
+
 import subprocess
 
 try:
@@ -26,11 +28,11 @@ class TestRunner(BaseTestRunner):
 
         from django.conf import settings
 
-        print "Running hooks from %s" % __name__
+        print("Running hooks from %s" % __name__)
 
         username = settings.DATABASES['default']['USER']
 
-        print " - Ensure %s can create a test DB" % username
+        print(" - Ensure %s can create a test DB" % username)
         subprocess.call(['sudo', 'su', 'postgres', '-c',
                          "psql -c 'alter user %s with createdb;'" % username])
 

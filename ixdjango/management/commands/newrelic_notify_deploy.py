@@ -5,6 +5,8 @@ Management command to enable New Relic notification of deployments
 
 """
 
+from __future__ import print_function
+
 import os
 from subprocess import call, Popen, PIPE
 
@@ -33,7 +35,7 @@ class Command(NoArgsCommand):
         except KeyError:
             ini_file = settings.NEW_RELIC_CONFIG
 
-        print "Informing New Relic...",
+        print("Informing New Relic...", end=' ')
 
         call(['newrelic-admin',
               'record-deploy',
