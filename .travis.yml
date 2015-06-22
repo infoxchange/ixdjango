@@ -8,3 +8,14 @@ install:
     - pip install -r dev_requirements.txt
 script:
     .githooks/pre-commit -f
+deploy:
+    provider: pypi
+    user: ixa
+    password:
+        secure: kyL2WItgVX9fIWLVRXtP8Tn2BCzfHml7ia/maXA2Dm1p5JfM3TrdNeZRsdzKxtbNplrPuTl9FiBYFYWHJIOyOmRaAO2d6re6cs2M0Oa/gyz2h42iQVR2FCfkeQS/erh/Vkf0Qm3mYrs4Ywws9l3XBseI6V3soRpL5n1D2CJ2sSY=
+    server: https://pypi.python.org/pypi
+    on:
+        tags: true
+        all_branches: true
+        python: 3.4
+        condition: "\"$TRAVIS_TAG\" = \"v$(python setup.py --version)\""
