@@ -1,6 +1,7 @@
 """
 Standard config for loading Django settings from Docker
 """
+from __future__ import absolute_import, unicode_literals, absolute_import
 
 import logging
 import logging.handlers
