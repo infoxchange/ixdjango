@@ -34,6 +34,7 @@ class Command(BaseCommand):
     """
 
     help = ('Cleans the specified applications\' tables to a pristine state.')
+    args = '<app_label> <app_label> ... '
 
     def handle(self, *targets, **options):
         verbosity = int(options['verbosity'])
