@@ -17,6 +17,7 @@ setup(
         "Django >= 1.7.0",
         "httplib2",
         "future",
+        "six",
     ],
     tests_require=[
         "pep8 >= 1.6.2",
