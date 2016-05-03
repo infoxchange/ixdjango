@@ -1,7 +1,7 @@
 """
 Standard config for loading Django settings from Docker
 """
-from __future__ import absolute_import, unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import logging
 import logging.handlers
@@ -40,7 +40,7 @@ SITE_URL = '{0}://{1}'.format(os.environ.get('SITE_PROTOCOL', ''),
 DATABASES = {}
 
 if 'DB_DEFAULT_URL' in os.environ:
-    import dj_database_url
+    import dj_database_url  # pylint:disable=wrong-import-position
 
     if ENVIRONMENT:
         DATABASES = {
@@ -53,7 +53,9 @@ ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URLS', '').split('|')
 
 # Memcache
 try:
-    import memcache  # pylint:disable=unused-import,import-error
+    # pylint:disable=unused-import,import-error,wrong-import-position
+    import memcache
+    # pylint:enable=unused-import,import-error,wrong-import-position
 
     CACHES = {
         'default': {
