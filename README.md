@@ -2,6 +2,9 @@
 IX Django
 =========
 
+[![Build Status](https://travis-ci.org/infoxchange/ixdjango.svg?branch=master)](https://travis-ci.org/infoxchange/ixdjango)
+[![PyPI](https://img.shields.io/pypi/v/ixdjango.svg?maxAge=2592000)](https://pypi.python.org/pypi/IXDjango)
+
 Management commands for Django application deployments.
 
 
