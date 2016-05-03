@@ -8,6 +8,7 @@ required.
 """
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
+# pylint:disable=redefined-builtin,unused-wildcard-import
 from future.builtins import *
 
 import logging
@@ -35,7 +36,9 @@ class Command(NoArgsCommand):
 
         # Wrap in a tuple if we were only given one command.
         if isinstance(deploy_cmds, str):
+            # pylint:disable=redefined-variable-type
             deploy_cmds = (deploy_cmds,)
+            # pylint:enable=redefined-variable-type
 
         for cmd in deploy_cmds:
             args = []

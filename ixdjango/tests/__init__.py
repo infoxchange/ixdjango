@@ -11,8 +11,8 @@ try:
     from django.test.runner import DiscoverRunner as BaseTestRunner
 except ImportError:
     from django.test.simple import DjangoTestSuiteRunner as BaseTestRunner
-# pylint:enable=import-error,no-name-in-module
 from django.utils import unittest
+# pylint:enable=import-error,no-name-in-module
 
 from ixdjango.test_suite.utils import (CoreUtilsTests)
 
