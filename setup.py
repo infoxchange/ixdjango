@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='IXDjango',
-    version='1.0.1',
+    version='1.0.2',
     author='Infoxchange Australia dev team',
     author_email='devs@infoxchange.net.au',
     packages=find_packages(),
