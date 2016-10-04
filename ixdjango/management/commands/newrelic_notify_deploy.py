@@ -11,15 +11,18 @@ import os
 from subprocess import call, Popen, PIPE
 
 from django.conf import settings
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     """
     Notify New Relic of the new version
     """
 
     def handle_noargs(self, **options):
+        """
+        Call the newrelic-admin command with the new version.
+        """
         # get the current git version
         git = Popen(('git', 'describe'), stdout=PIPE)
         ver, _ = git.communicate()

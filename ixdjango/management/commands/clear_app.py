@@ -36,6 +36,9 @@ class Command(BaseCommand):
     args = '<app_label> <app_label> ... '
 
     def handle(self, *targets, **options):
+        """
+        Clear the data for the given apps.
+        """
         verbosity = int(options['verbosity'])
 
         models = []
