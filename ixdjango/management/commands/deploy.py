@@ -13,22 +13,25 @@ from future.builtins import *
 
 import logging
 
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 from django.core import management
 from django.conf import settings
 
 LOGGER = logging.getLogger(__name__)
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     """
     This command is a simple aggregate command to allow us (the devs) to
     easily add deployment steps to our release process e.g. to add a JS minify
-    step without needing to add steps to the puppet release manfiest.
+    step without needing to add steps to the puppet release manifest.
 
     See http://redmine.office.infoxchange.net.au/issues/7854
     """
     def handle_noargs(self, **options):
+        """
+        Run all the commands specfied in `settings.IX_DEPLOY_CMDS`.
+        """
         try:
             deploy_cmds = settings.IX_DEPLOY_CMDS
         except AttributeError:

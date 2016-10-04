@@ -11,20 +11,24 @@ from __future__ import print_function
 import logging
 
 import six
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 from django.core import management
 from django.conf import settings
 
 LOGGER = logging.getLogger(__name__)
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     """
     Loads the fixtures contained inside IX_FIXTURES setting variable.
 
     See http://redmine.office.infoxchange.net.au/issues/8376
     """
+
     def handle_noargs(self, **options):
+        """
+        Load the fixtures.
+        """
         try:
             ix_fixtures = settings.IX_FIXTURES
         except AttributeError:

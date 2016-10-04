@@ -8,15 +8,18 @@ import os
 from shutil import copy2, copystat
 
 from django.conf import settings
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     """
     Copy static files to nginx location
     """
 
     def handle_noargs(self, **options):
+        """
+        Copy the static files.
+        """
         try:
             static_dir = settings.NGINX_STATIC_DIR
         except AttributeError:
