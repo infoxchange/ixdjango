@@ -28,7 +28,8 @@ class Command(BaseCommand):
 
     See http://redmine.office.infoxchange.net.au/issues/7854
     """
-    def handle_noargs(self, **options):
+
+    def handle(self, *args, **options):
         """
         Run all the commands specfied in `settings.IX_DEPLOY_CMDS`.
         """

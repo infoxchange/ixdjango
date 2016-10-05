@@ -16,7 +16,7 @@ class Command(BaseCommand):
     Copy static files to nginx location
     """
 
-    def handle_noargs(self, **options):
+    def handle(self, *args, **options):
         """
         Copy the static files.
         """
