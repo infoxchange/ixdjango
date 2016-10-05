@@ -19,7 +19,7 @@ class Command(BaseCommand):
     Notify New Relic of the new version
     """
 
-    def handle_noargs(self, **options):
+    def handle(self, *args, **options):
         """
         Call the newrelic-admin command with the new version.
         """

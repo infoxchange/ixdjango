@@ -25,7 +25,7 @@ class Command(BaseCommand):
     See http://redmine.office.infoxchange.net.au/issues/8376
     """
 
-    def handle_noargs(self, **options):
+    def handle(self, *args, **options):
         """
         Load the fixtures.
         """
