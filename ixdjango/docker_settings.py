@@ -47,6 +47,20 @@ if 'DB_DEFAULT_URL' in os.environ:
             'default': dj_database_url.parse(os.environ['DB_DEFAULT_URL'])
         }
 
+if 'DB_DEFAULT_STANDBY_URL' in os.environ:
+    # if available configure the standby database
+    DATABASES['standby'] = dj_database_url.parse(
+        os.environ['DB_DEFAULT_STANDBY_URL'])
+    DATABASES['standby'].update({
+        'TEST_MIRROR': 'default',
+    })
+
+    DATABASE_ROUTERS = [
+        'ixdjango.dbrouter.MasterSlaveRouter',
+    ]
+else:
+    DATABASE_ROUTERS = []
+
 # Elasticsearch
 ELASTICSEARCH_INDEX_NAME = os.environ.get('ELASTICSEARCH_INDEX_NAME')
 ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URLS', '').split('|')
