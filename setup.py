@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='IXDjango',
-    version='1.0.3',
+    version='1.0.4',
     author='Infoxchange Australia dev team',
     author_email='devs@infoxchange.net.au',
     packages=find_packages(),
@@ -14,7 +14,7 @@ setup(
     description='Management commands for deploying Django projects.',
     long_description=open('README.md').read(),
     install_requires=[
-        "Django >= 1.7.0",
+        "Django >= 1.8.0",
         "httplib2",
         "future",
         "six",
