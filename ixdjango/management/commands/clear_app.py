@@ -35,14 +35,17 @@ class Command(BaseCommand):
     help = ('Cleans the specified applications\' tables to a pristine state.')
     args = '<app_label> <app_label> ... '
 
-    def handle(self, *targets, **options):
+    def add_arguments(self, parser):
+        parser.add_argument('app_models', nargs='+', type=str)
+
+    def handle(self, *args, **options):
         """
         Clear the data for the given apps.
         """
         verbosity = int(options['verbosity'])
 
         models = []
-        for target in targets:
+        for target in options['app_models']:
             target = target.split('.')
 
             try:
