@@ -1,4 +1,4 @@
-Django>=1.11.15,<2.0
+Django>=1.11.19,<2.0
 South
 dj-database-url
 future
