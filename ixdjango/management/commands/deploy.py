@@ -54,6 +54,4 @@ class Command(BaseCommand):
                     # pylint:enable=unbalanced-tuple-unpacking
                 else:
                     (cmd, args) = cmd
-            # interactive=False is the same as --noinput.
-            kwargs.setdefault('interactive', False)
             management.call_command(cmd, *args, **kwargs)
