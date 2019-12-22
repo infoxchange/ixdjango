@@ -42,8 +42,7 @@ class Command(BaseCommand):
             print("Loading IX_FIXTURES: {0}".format(','.join(ix_fixtures)))
             management.call_command(
                 "loaddata",
-                *ix_fixtures,
-                interactive=False
+                *ix_fixtures
             )
         else:
             print("loadixfixtures does nothing unless settings.IX_FIXTURES "
