@@ -34,6 +34,13 @@ Clear specified app's models of data
 Uses the settings `NEW_RELIC_CONFIG`, `NEW_RELIC_ENV` and `NEW_RELIC_API_KEY`
 to inform New Relic of an application deployment.
 
+Django versions
+---------------
+
+* To use with Django 1.11.x projects, use `IXDjango = "<2,>=1.0"`
+* To use with Django 2.2.x projects, use `IXDjango = "<3,>=2.0"`
+
+
 Docker Settings
 ---------------
 
