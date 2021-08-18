@@ -31,10 +31,13 @@ USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Allowed hosts, Site domain and URL
-ALLOWED_HOSTS = os.environ.get('SITE_DOMAIN', '').split('|')
-MY_SITE_DOMAIN = ALLOWED_HOSTS[0]
-SITE_URL = '{0}://{1}'.format(os.environ.get('SITE_PROTOCOL', ''),
-                              MY_SITE_DOMAIN)
+ALLOWED_HOSTS = ["*"]
+try:
+    MY_SITE_DOMAIN = os.environ.get('SITE_DOMAIN', '').split('|')[0]
+    SITE_URL = '{0}://{1}'.format(os.environ.get('SITE_PROTOCOL', ''),
+                                MY_SITE_DOMAIN)
+except KeyError:
+    pass
 
 # Databases
 DATABASES = {}
