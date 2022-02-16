@@ -23,7 +23,6 @@ if ENVIRONMENT == 'dev_local':
 
 # Debugging
 DEBUG = ENVIRONMENT in ('dev_local', 'dev', 'test')
-TEMPLATE_DEBUG = DEBUG
 TASTYPIE_FULL_DEBUG = DEBUG
 
 # Trust nginx
