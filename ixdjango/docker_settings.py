@@ -153,37 +153,7 @@ LOGGING = {
     },
 }
 
-if ENVIRONMENT not in (None, 'dev_local',):
-    # configure logstash on sites other than dev_local
-    # N.B. Travis is also running as dev_local
-
-    LOGGING_ADDRESS = (os.environ.get('SYSLOG_SERVER', 'localhost'),
-                       int(os.environ.get('SYSLOG_PORT',
-                                          logging.handlers.SYSLOG_UDP_PORT)))
-    LOGGING_SOCKTYPE = ({
-        'tcp': socket.SOCK_STREAM,
-        'udp': socket.SOCK_DGRAM,
-    })[os.environ.get('SYSLOG_PROTO', 'udp')]
-
-    LOGGING['handlers']['logstash'] = {
-        'level': 'DEBUG' if DEBUG else 'INFO',
-        'class': 'ixdjango.logging_.SysLogHandler',
-        'address': LOGGING_ADDRESS,
-        'socktype': LOGGING_SOCKTYPE,
-        'formatter': 'ixa',
-    }
-
-    # send all logs to logstash
-    for logger in LOGGING['loggers'].values():
-        logger['handlers'].insert(0, 'logstash')
-
-    CONSOLE_OUTPUT_DISABLED = True  # Default; may be overridden
-
-else:
-    CONSOLE_OUTPUT_DISABLED = False  # Default; may be overridden
-
-CONSOLE_OUTPUT_DISABLED = bool(os.environ.get('CONSOLE_OUTPUT_DISABLED',
-                                              CONSOLE_OUTPUT_DISABLED))
+CONSOLE_OUTPUT_DISABLED = bool(os.environ.get('CONSOLE_OUTPUT_DISABLED'))
 
 if not CONSOLE_OUTPUT_DISABLED:
     # show request logs on the console
