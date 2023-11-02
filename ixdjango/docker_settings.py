@@ -73,6 +73,8 @@ except (ImportError, KeyError):
 # Email
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
 EMAIL_PORT = os.environ.get('EMAIL_PORT', 25)
+EMAIL_HOST_USER = os.environ.get('EMAIL_USERNAME', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
 DEFAULT_FROM_EMAIL = 'do.not.reply@%s' % MY_SITE_DOMAIN
 
 # Secret key
