@@ -77,6 +77,9 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_USERNAME', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
 DEFAULT_FROM_EMAIL = 'do.not.reply@%s' % MY_SITE_DOMAIN
 
+if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    EMAIL_USE_TLS = True
+
 # Secret key
 if not hasattr(
         sys.modules[os.environ['DJANGO_SETTINGS_MODULE']],
