@@ -1,8 +1,6 @@
-=========
 IX Django
 =========
 
-[![Build Status](https://travis-ci.org/infoxchange/ixdjango.svg?branch=master)](https://travis-ci.org/infoxchange/ixdjango)
 [![PyPI](https://img.shields.io/pypi/v/ixdjango.svg?maxAge=2592000)](https://pypi.python.org/pypi/IXDjango)
 
 Management commands for Django application deployments.
@@ -64,7 +62,7 @@ Provides the following configuration variables:
  * `DATABASES['default']`
  * `X_FORWARDED_HOST`, `SECURE_PROXY_SSL_HEADER`
  * `MY_SITE_DOMAIN`, `ALLOWED_HOSTS`, `SITE_URL`
- * `EMAIL_HOST`, `EMAIL_PORT`, `DEFAULT_FROM_EMAIL`
+ * `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `DEFAULT_FROM_EMAIL`
  * `LOGGING`
  * `STORAGE_DIR`, `NGINX_STATIC_DIR` (Docker storage locations)
  * `STATIC_ROOT`, `MEDIA_ROOT`
